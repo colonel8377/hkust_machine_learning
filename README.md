@@ -5,11 +5,17 @@ Machine Learning and Description
 <!-- PROJECT SHIELDS -->
 
 [![Contributors][contributors-shield]][contributors-url]
+<br />
 [![Forks][forks-shield]][forks-url]
+<br />
 [![Stargazers][stars-shield]][stars-url]
+<br />
 [![Issues][issues-shield]][issues-url]
+<br />
 [![MIT License][license-shield]][license-url]
+<br />
 [![LinkedIn][linkedin-shield]][linkedin-url]
+<br />
 
 <!-- PROJECT LOGO -->
 <br />
@@ -20,14 +26,14 @@ Machine Learning and Description
   <p align="center">
     HKUST MACHINE LEARNING
     <br />
-    <a href="https://github.com/shaojintian/Best_README_template"><strong>探索本项目的文档 »</strong></a>
+    <a href="https://github.com/colonel8377/hkust_machine_learning"><strong>探索本项目的文档 »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/shaojintian/Best_README_template">查看Demo</a>
+    <a href="https://github.com/colonel8377/hkust_machine_learning">查看Demo</a>
     ·
-    <a href="https://github.com/shaojintian/Best_README_template/issues">报告Bug</a>
+    <a href="https://github.com/colonel8377/hkust_machine_learning">报告Bug</a>
     ·
-    <a href="https://github.com/shaojintian/Best_README_template/issues">提出新特性</a>
+    <a href="https://github.com/colonel8377/hkust_machine_learning">提出新特性</a>
   </p>
 
 </p>
