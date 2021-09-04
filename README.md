@@ -15,9 +15,6 @@ Machine Learning and Description
 <br />
 
 <p align="center">
-  <a href="https://github.com/shaojintian/Best_README_template/">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
 
   <h3 align="center">HKUST MACHINE LEARNING</h3>
   <p align="center">
