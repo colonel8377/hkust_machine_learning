@@ -1,4 +1,4 @@
-# Machine Learning
+# HKUST Machine Learning PROJECT
 
 Machine Learning and Description
 
