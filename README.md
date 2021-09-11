@@ -1,32 +1,14 @@
-# HKUST Machine Learning PROJECT
+# 机器学习
 
 Machine Learning and Description
-
-<!-- PROJECT SHIELDS -->
-
-[![Contributors][contributors-shield]][contributors-url]
-<br />
-[![Forks][forks-shield]][forks-url]
-<br />
-[![Stargazers][stars-shield]][stars-url]
-<br />
-[![Issues][issues-shield]][issues-url]
-<br />
-[![MIT License][license-shield]][license-url]
-<br />
-[![LinkedIn][linkedin-shield]][linkedin-url]
-<br />
-
-<!-- PROJECT LOGO -->
-<br />
 
 <p align="center">
 
   <h3 align="center">HKUST MACHINE LEARNING</h3>
   <p align="center">
-    HKUST MACHINE LEARNING
-    <br />
-    <a href="https://github.com/colonel8377/hkust_machine_learning"><strong>探索本项目的文档 »</strong></a>
+    HKUST MACHINE LEARNING PROJECT
+    <br/><br/>
+    <a href="https://github.com/colonel8377/hkust_machine_learning"><strong>探索本项目的文档</strong></a>
     <br />
     <br />
     <a href="https://github.com/colonel8377/hkust_machine_learning">查看Demo</a>
@@ -39,15 +21,20 @@ Machine Learning and Description
 </p>
 
 
- 本篇README.md面向开发者
+本篇README.md面向开发者
+
+This README.md is for developer.
  
 ## 目录
 
-- [HKUST Machine Learning PROJECT](#hkust-machine-learning-project)
+- [机器学习](#机器学习)
   - [目录](#目录)
+    - [学习资料](#学习资料)
+    - - [**大数据学习之路**](#大数据学习之路)
+    - [论文集](#论文集)
     - [上手指南](#上手指南)
-          - [开发前的配置要求](#开发前的配置要求)
-          - [**安装步骤**](#安装步骤)
+    - - [**开发指南**](#开发指南)
+    - - [**安装步骤**](#安装步骤)
     - [文件目录说明](#文件目录说明)
     - [开发的架构](#开发的架构)
     - [部署](#部署)
@@ -59,16 +46,37 @@ Machine Learning and Description
     - [版权说明](#版权说明)
     - [鸣谢](#鸣谢)
 
+### 学习资料
+- [AD-paper-warehouse](https://github.com/wzhe06/Ad-papers)
+- [Spark Document](https://spark.apache.org/docs/latest/)
+- [TensorFlow](https://www.tensorflow.org/api_docs)
+- [Tencent Algo Competition](https://algo.qq.com/archive.html)
+- [Alibaba Tianchi](https://tianchi.aliyun.com/dataset)
+##### 大数据学习之路
+
+Hadoop生态圈
+- [Hadoop极简入门](https://github.com/wangzhiwubigdata/God-Of-BigData/tree/master/Hadoop)
+- [Hadoop](https://github.com/wzdnzd/bigdata-notes/tree/master/docs/%E5%A4%A7%E6%95%B0%E6%8D%AE%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3/01.Hadoop)
+- [Hive](https://github.com/wzdnzd/bigdata-notes/tree/master/docs/%E5%A4%A7%E6%95%B0%E6%8D%AE%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3/03.Hive)
+- [Hive调优](https://mp.weixin.qq.com/s/Eh3QQ35ticIdjqFefCTi0A)
+
+计算引擎
+- [Spark](https://github.com/wzdnzd/bigdata-notes/tree/master/docs/%E5%A4%A7%E6%95%B0%E6%8D%AE%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3/11.Spark)
+- [Flink](https://github.com/wzdnzd/bigdata-notes/tree/master/docs/%E5%A4%A7%E6%95%B0%E6%8D%AE%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3/13.Flink)
+
+计算新趋势
+- [Doris](https://doris.apache.org/master/zh-CN/)
+
+### 论文集
+- [Tencent-2020-AD-Competition-First Prize](https://github.com/guoday/Tencent2020_Rank1st)
+- [阿里妈妈ESMM稀疏矩阵](https://arxiv.org/abs/1804.07931)
+- [LR模型](https://people.csail.mit.edu/romer/papers/TISTRespPredAds.pdf)
+
 ### 上手指南
 
+#### **开发指南**
 
-
-###### 开发前的配置要求
-
-1. xxxxx x.x.x
-2. xxxxx x.x.x
-
-###### **安装步骤**
+#### **安装步骤**
 
 1. Get a free API Key at [https://example.com](https://example.com)
 2. Clone the repo
@@ -99,10 +107,6 @@ filetree
 └── /util/
 
 ```
-
-
-
-
 
 ### 开发的架构 
 
@@ -143,7 +147,11 @@ filetree
 
 ### 作者
 
-xxx@xxxx
+- Huang, Chaojie 773321667@qq.com
+- LI, Yilin zjlyl92@gmail.com
+- YE, Qiming qyeaf@connect.ust.hk
+- YUN, Ruolan 1259887664@qq.com
+
 
  *您也可以在贡献者名单中参看所有参与该项目的开发者。*
 
