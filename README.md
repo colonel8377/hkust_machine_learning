@@ -54,7 +54,8 @@ This README.md is for developer.
 - [Alibaba Tianchi](https://tianchi.aliyun.com/dataset)
 - [Alibaba Algo Blog](https://www.zuozuovera.com/)
 ##### 大数据学习之路
-
+框架
+- [古早框架](https://www.zuozuovera.com/archives/609/)
 Hadoop生态圈
 - [Hadoop极简入门](https://github.com/wangzhiwubigdata/God-Of-BigData/tree/master/Hadoop)
 - [Hadoop](https://github.com/wzdnzd/bigdata-notes/tree/master/docs/%E5%A4%A7%E6%95%B0%E6%8D%AE%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3/01.Hadoop)
