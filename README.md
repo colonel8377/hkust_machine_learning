@@ -52,6 +52,7 @@ This README.md is for developer.
 - [TensorFlow](https://www.tensorflow.org/api_docs)
 - [Tencent Algo Competition](https://algo.qq.com/archive.html)
 - [Alibaba Tianchi](https://tianchi.aliyun.com/dataset)
+- [Alibaba Algo Blog](https://www.zuozuovera.com/)
 ##### 大数据学习之路
 
 Hadoop生态圈
