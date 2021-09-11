@@ -72,6 +72,7 @@ Hadoop生态圈
 - [Tencent-2020-AD-Competition-First Prize](https://github.com/guoday/Tencent2020_Rank1st)
 - [阿里妈妈ESMM稀疏矩阵](https://arxiv.org/abs/1804.07931)
 - [LR模型](https://people.csail.mit.edu/romer/papers/TISTRespPredAds.pdf)
+- [Factorization Machine](https://www.csie.ntu.edu.tw/~b97053/paper/Rendle2010FM.pdf)
 
 ### 上手指南
 
