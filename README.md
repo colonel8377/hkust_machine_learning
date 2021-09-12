@@ -30,6 +30,7 @@ This README.md is for developer.
 - [机器学习](#机器学习)
   - [目录](#目录)
     - [学习资料](#学习资料)
+    - - [**数学工具**](#数学工具)
     - - [**大数据学习之路**](#大数据学习之路)
     - [论文集](#论文集)
     - [上手指南](#上手指南)
@@ -53,6 +54,10 @@ This README.md is for developer.
 - [Tencent Algo Competition](https://algo.qq.com/archive.html)
 - [Alibaba Tianchi](https://tianchi.aliyun.com/dataset)
 - [Alibaba Algo Blog](https://www.zuozuovera.com/)
+- [SVM Basic Concept](https://zhuanlan.zhihu.com/p/61123737)
+
+##### 数学工具
+- Hilbert空间
 ##### 大数据学习之路
 
 框架
