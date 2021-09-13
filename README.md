@@ -171,7 +171,7 @@ filetree
 
 ### 版权说明
 
-该项目签署了MIT 授权许可，详情请参阅 [LICENSE.txt](https://github.com/colonel8377/hkust_machine_learning/blob/master/LICENSE.txt)
+该项目签署了MIT 授权许可，详情请参阅 [LICENSE.txt](https://github.com/colonel8377/hkust_machine_learning/blob/main/LICENSE)
 
 ### 鸣谢
 
