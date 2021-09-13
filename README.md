@@ -68,13 +68,17 @@
 
 
 ## 学习资料
-- [AD-paper-warehouse](https://github.com/wzhe06/Ad-papers)
+### 技术框架学习
 - [Spark Document](https://spark.apache.org/docs/latest/)
 - [TensorFlow](https://www.tensorflow.org/api_docs)
+### AI相关赛事
 - [Tencent Algo Competition](https://algo.qq.com/archive.html)
 - [Alibaba Tianchi](https://tianchi.aliyun.com/dataset)
-- [Alibaba Algo Blog](https://www.zuozuovera.com/)
+- [Alibaba Algo Blog（这个链接好像是错的）](https://www.zuozuovera.com/)
+
+### 经典机器学习模型解释
 - [SVM Basic Concept](https://zhuanlan.zhihu.com/p/61123737)
+### 机器学习/深度学习课程
 - [Machine Learning by ZHOU, Zhihua](https://github.com/Mikoto10032/DeepLearning/blob/master/books/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%91%A8%E5%BF%97%E5%8D%8E.pdf)
 - [李宏毅机器学习课程](https://www.bilibili.com/video/BV1Wv411h7kN?from=search&seid=6754756197913029782&spm_id_from=333.337.0.0)
 - [深度学习实战项目B站视频](https://www.bilibili.com/video/BV1ut4y1S7gP)
@@ -105,7 +109,8 @@ Hadoop生态圈
 计算新趋势
 - [Doris](https://doris.apache.org/master/zh-CN/)
 
-### 论文集
+### 论文
+- [机器学习+广告 论文集](https://github.com/wzhe06/Ad-papers)
 - [Tencent-2020-AD-Competition-First Prize](https://github.com/guoday/Tencent2020_Rank1st)
 - [阿里妈妈ESMM稀疏矩阵](https://arxiv.org/abs/1804.07931)
 - [LR模型](https://people.csail.mit.edu/romer/papers/TISTRespPredAds.pdf)
