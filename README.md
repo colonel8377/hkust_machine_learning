@@ -59,6 +59,9 @@ This README.md is for developer.
 
 ##### 数学工具
 - Hilbert空间
+- BOLTZMANN MACHINE
+- GIBBS DISTRIBUTION
+
 ##### 大数据学习之路
 
 框架
