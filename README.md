@@ -1,3 +1,8 @@
+# **Important Notes**
+- [**GITHUB COMMIT MESSAGE RULES(Angular)**](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#heading=h.greljkmo14y0) 
+- [**GITHUB GUIDE**](https://guides.github.com/introduction/git-handbook/)
+- [**基于master分支的pr**](https://github.com/livoras/blog/issues/7)
+
 # 目录
 
 - [目录](#目录)
