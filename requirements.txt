@@ -3,3 +3,5 @@ flake8
 yapf==0.28.0
 
 mypy
+
+numpy~=1.19.2
