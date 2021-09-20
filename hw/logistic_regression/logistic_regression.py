@@ -9,8 +9,8 @@ def load_data_set():
     fr = open(filename)
     for line in fr.readlines():
         line_arr = line.strip().split()
-        data_mat.append([1.0, float(line_arr[0]), float(line_arr[1])])
-        label_mat.append(int(line_arr[2]))
+        data_mat.append([1.0, float(line_arr[0]), float(line_arr[1]), float(line_arr[2]),])
+        label_mat.append(int(line_arr[3]))
     return data_mat, label_mat
 
 
@@ -22,13 +22,15 @@ def grad_ascent(data_mat, label_mat, weights):
     data_matrix = mat(data_mat)
     class_label = mat(label_mat).transpose()
     m, n = shape(data_matrix)
-    alpha = 0.1
-    max_cycle = 500
-    weights = mat(weights).transpose()
+    alpha = 0.01
+    max_cycle = 500000
+    weights = ones((n, 1))
+    error = 0
     for k in range(max_cycle):
         h = sigmoid(data_matrix * weights)
         error = (class_label - h)
-        weights = weights + alpha * (1/m) * data_matrix.transpose() * error
+        weights = weights + alpha * data_matrix.transpose() * error
+    print(error)
     return weights
 
 
@@ -63,7 +65,8 @@ def plot_base_fit(weights):  # 画出最终分类的图
 def main():
     data_mat, label_mat = load_data_set()
     weights = grad_ascent(data_mat, label_mat, [-2.0, 1.0, 1.0]).getA()
-    plot_base_fit(weights)
+    print(weights)
+    # plot_base_fit(weights)
 
 
 if __name__ == '__main__':
