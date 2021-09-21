@@ -47,9 +47,6 @@ class Point(object):
     def __str__(self):
         return '(' + str(self.x) + ',' + str(self.y) + ')'
 
-    def scatter(self):
-        plt.scatter(x=self.x, y=self.y)
-
 
 def generate_points(inputs):
     res = []
@@ -60,7 +57,7 @@ def generate_points(inputs):
 
 if __name__ == '__main__':
     data = generate_points([(55, 50), (43, 50), (55, 52), (43, 54), (58, 53), (41, 47), (50, 41), (50, 70)])
-    initial_means = generate_points([(50, 41), (50, 70)])
+    initial_means = generate_points([(50, 41), (50, 70), (43, 50), (55, 50)])
     eps = 1
     final_clusters, centrals = cluster_process(data, len(initial_means), initial_means, eps)
 
@@ -72,7 +69,7 @@ if __name__ == '__main__':
     for central in centrals:
         print(central)
 
-    color = ["pink", "yellow", "red", "yellow", "black"]
+    color = ["pink", "yellow", "red", "yellow", "black", "green", "orange"]
     for i in range(len(final_clusters)):
         plt.scatter([p.x for p in final_clusters[i]], [p.y for p in final_clusters[i]], c=color[i])
     for central in centrals:
