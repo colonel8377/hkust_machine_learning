@@ -3,3 +3,7 @@ flake8
 yapf==0.28.0
 
 mypy
+
+numpy~=1.19.2
+scikit-learn~=0.23.1
+matplotlib~=3.3.4
