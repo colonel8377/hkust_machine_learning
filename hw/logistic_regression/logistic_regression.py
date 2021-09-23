@@ -1,3 +1,5 @@
+import mpmath
+import numpy as np
 from numpy import *
 filename = 'logistic_test'
 
@@ -17,23 +19,20 @@ def sigmoid(in_x):
     return 1.0 / (1 + exp(-in_x))
 
 
-def grad_ascent(data_mat, label_mat, weights, max_cycle):
+def grad_ascent(data_mat, label_mat, weights, max_cycle, alpha):
     data_matrix = mat(data_mat)
-    class_label = mat(label_mat).transpose()
+    class_label = mat(label_mat)
     m, n = shape(data_matrix)
-    alpha = 0.1
     weight = mat(weights).transpose()
-    alpha = 0.01
-    max_cycle = 500000
-    weights = ones((n, 1))
+    print(weight.shape)
+
+    # weights = ones((n, 1))
     error = 0
     for k in range(max_cycle):
         h = sigmoid(data_matrix * weight)
         error = (class_label - h)
-        weights = weights + alpha * (1/m) * data_matrix.transpose() * error
-        weights = weights + alpha * data_matrix.transpose() * error
-    print(error)
-    return weights
+        weight = weight + alpha * (1/m) * (error.transpose() * data_matrix).transpose()
+    return weight
 
 
 def plot_base_fit(weights):  # 画出最终分类的图
@@ -65,10 +64,17 @@ def plot_base_fit(weights):  # 画出最终分类的图
 
 
 def main():
-    data_mat, label_mat = load_data_set()
-    weights = grad_ascent(data_mat, label_mat, [-2.0, 1.0, 1.0], 500).getA()
-    plot_base_fit(weights)
-    print(weights)
+    data_mat = np.random.randint(0, 10, (100, 15))
+    data_mat[:, 0] = 0
+    label_mat = np.random.randint(0, 100, (100, 1))
+    for i in range(5):
+        data_mat[random.randint(0, 100)][0] = 1
+    loops = 100000
+    print('Number of loops ' + str(loops))
+    weight = grad_ascent(data_mat, label_mat, [1] * 15, loops, 0.1)
+    # plot_base_fit(weights)
+    np.set_printoptions(threshold=np.inf)
+    print(weight.getA().transpose())
     # plot_base_fit(weights)
 
 
