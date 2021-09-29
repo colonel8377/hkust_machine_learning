@@ -13,21 +13,24 @@ import os
 import math
 
 # Data sets
-IRIS_TRAINING = "iris_data/iris_training.csv"
-IRIS_TEST = "iris_data/iris_test.csv"
+# IRIS_TRAINING = "iris_data/iris_training.csv"
+# IRIS_TEST = "iris_data/iris_test.csv"
+from sklearn.externals._arff import xrange
+
+IRIS_TRAINING = "D:\hkust\lesson\project\hkust_machine_learning\hw\softmax\iris_training.csv"
+IRIS_TEST = "D:\hkust\lesson\project\hkust_machine_learning\hw\softmax\iris_test.csv"
 
 
 def get_data():
     # Load datasets.
-    train_data = np.genfromtxt(IRIS_TRAINING, skip_header=1, 
-        dtype=float, delimiter=',') 
-    test_data = np.genfromtxt(IRIS_TEST, skip_header=1, 
-        dtype=float, delimiter=',') 
+    train_data = np.genfromtxt(IRIS_TRAINING, skip_header=1,
+                               dtype=float, delimiter=',')
+    test_data = np.genfromtxt(IRIS_TEST, skip_header=1,
+                              dtype=float, delimiter=',')
     train_x = train_data[:, :4]
     train_y = train_data[:, 4].astype(np.int64)
     test_x = test_data[:, :4]
     test_y = test_data[:, 4].astype(np.int64)
-
     return train_x, train_y, test_x, test_y
 
 
@@ -45,45 +48,28 @@ def compute_softmax_loss(W, X, y, reg):
             
     - dW: the gradient for W.
     """
- 
-
     #############################################################################
     # TODO: Compute the softmax loss and its gradient.                          #
     # Store the loss in loss and the gradient in dW. If you are not careful     #
     # here, it is easy to run into numeric instability. Don't forget the        #
     # regularization!                                                           #
     #############################################################################
-    dW = np.zeros_like(W)
-    num_train = X.shape[0]  # x的样本数量
     loss = 0.0
-    # score = X.dot(W)
-    # score -= np.max(score, axis=1)[:, np.newaxis]  # axis = 1每一行的最大值，score仍为500*10
-    # correct_score = score[range(num_train), y]  # correct_score变为500*1
-    # exp_score = np.exp(score)
-    # sum_exp_score = np.sum(exp_score, axis=1)  # sum_exp_score为500*1
-    # loss = np.sum(np.log(sum_exp_score)) - np.sum(correct_score)
-    # exp_score /= sum_exp_score[:, np.newaxis]  # exp_score为500*10
-    # for i in range(num_train):
-    #     dW += exp_score[i] * X[i][:, np.newaxis]  # X[i][:,np.newaxis]将X[i]增加一列纬度
-    #     dW[:, y[i]] -= X[i]
-    # loss /= num_train
-    # loss += 0.5 * reg * np.sum(W * W)
-    # dW /= num_train
-    # dW += reg * W
+    dW = np.zeros_like(W)
     num_train = X.shape[0]
     num_class = W.shape[1]
     for i in range(num_train):
-        score = X[i].dot(W)
+        score = X[i, :].dot(W)
         score -= np.max(score)
         correct_score = score[y[i]]
         exp_sum = np.sum(np.exp(score))
-        loss += np.log(exp_sum) - correct_score
+        p = np.exp(correct_score) / exp_sum
+        loss += -np.log(p)
         for j in range(num_class):
-
             if j == y[i]:
-                dW[:, j] += np.exp(score[j]) / exp_sum * X[i] - X[i]
+                dW[:, j] += np.exp(score[j]) / exp_sum * X[i, :] - X[i, :]
             else:
-                dW[:, j] += np.exp(score[j]) / exp_sum * X[i]
+                dW[:, j] += (np.exp(score[j]) / exp_sum) * X[i]
     loss /= num_train
     loss += 0.5 * reg * np.sum(W * W)
     dW /= num_train
@@ -108,12 +94,11 @@ def predict(W, X):
       array of length N, and each element is an integer giving the predicted
       class.
     """
-    
+
     ###########################################################################
     # TODO:                                                                   #
     # Implement this method. Store the predicted labels in y_pred.            #
     ###########################################################################
-    y_pred = np.zeros(X.shape[1])
     score = X.dot(W)
     y_pred = np.argmax(score, axis=1)
     ###########################################################################
@@ -121,15 +106,16 @@ def predict(W, X):
     ###########################################################################
     return y_pred
 
+
 def acc(ylabel, y_pred):
     return np.mean(ylabel == y_pred)
 
 
 def train(X, y, Xtest, ytest, learning_rate=1e-3, reg=1e-5, epochs=100, batch_size=20):
     num_train, dim = X.shape
-    num_classes = np.max(y) + 1 # assume y takes values 0...K-1 where K is number of classes
-    num_iters_per_epoch = int(math.floor(1.0*num_train/batch_size))
-    
+    num_classes = np.max(y) + 1  # assume y takes values 0...K-1 where K is number of classes
+    num_iters_per_epoch = int(math.floor(1.0 * num_train / batch_size))
+
     # randomly initialize W
     W = 0.001 * np.random.randn(dim, num_classes)
 
@@ -137,10 +123,10 @@ def train(X, y, Xtest, ytest, learning_rate=1e-3, reg=1e-5, epochs=100, batch_si
         perm_idx = np.random.permutation(num_train)
         # perform mini-batch SGD update
         for it in range(num_iters_per_epoch):
-            idx = perm_idx[it*batch_size:(it+1)*batch_size]
+            idx = perm_idx[it * batch_size:(it + 1) * batch_size]
             batch_x = X[idx]
             batch_y = y[idx]
-            
+
             # evaluate loss and gradient
             loss, grad = compute_softmax_loss(W, batch_x, batch_y, reg)
 
@@ -152,9 +138,10 @@ def train(X, y, Xtest, ytest, learning_rate=1e-3, reg=1e-5, epochs=100, batch_si
             train_acc = acc(y, predict(W, X))
             test_acc = acc(ytest, predict(W, Xtest))
             print('Epoch %4d: loss = %.2f, train_acc = %.4f, test_acc = %.4f' \
-                % (epoch, loss, train_acc, test_acc))
-    
+                  % (epoch, loss, train_acc, test_acc))
+
     return W
+
 
 max_epochs = 200
 batch_size = 20
@@ -165,19 +152,15 @@ reg = 0.01
 train_x, train_y, test_x, test_y = get_data()
 W = train(train_x, train_y, test_x, test_y, learning_rate, reg, max_epochs, batch_size)
 
+
 # Classify two new flower samples.
 def new_samples():
     return np.array(
-      [[6.4, 3.2, 4.5, 1.5],
-       [5.8, 3.1, 5.0, 1.7]], dtype=np.float32)
+        [[6.4, 3.2, 4.5, 1.5],
+         [5.8, 3.1, 5.0, 1.7]], dtype=np.float32)
 
 
 new_x = new_samples()
 predictions = predict(W, new_x)
 
 print("New Samples, Class Predictions:    {}\n".format(predictions))
-
-if __name__ == '__main__':
-    train_x, train_y, test_x, test_y = get_data()
-    W = train(train_x, train_y, test_x, test_y, learning_rate, reg, max_epochs, batch_size)
-    print(W)

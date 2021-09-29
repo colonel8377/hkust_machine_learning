@@ -289,20 +289,24 @@ def demo():
 
     # compute the distance matrix on the basis of the vectors via sklearn:
     # dist_matrix = pairwise_distances(vectors, metric='cityblock')
-    dist_matrix = np.array([[0.0, 11.0, 5.0, 12.0, 7.0, 13.0, 9.0, 11.0],
-                             [11.0, 0.0, 13.0, 2.0, 17.0, 4.0, 15.0, 20.0],
-                             [5.0, 13.0, 0.0, 14.0, 1.0, 15.0, 12.0, 12.0],
-                             [12.0, 2.0, 14.0, 0.0, 18.0, 5.0, 16.0, 21.0],
-                             [7.0, 17.0, 1.0, 18.0, 0.0, 20.0, 15.0, 17.0],
-                             [13.0, 4.0, 15.0, 5.0, 20.0, 0.0, 19.0, 22.0],
-                             [9.0, 15.0, 12.0, 16.0, 15.0, 19.0, 0.0, 30.0],
-                             [11.0, 20.0, 12.0, 21.0, 17.0, 22.0, 30.0, 0.0]])
+    # dist_matrix = np.array([[0.0, 11.0, 5.0, 12.0, 7.0, 13.0, 9.0, 11.0],
+    #                          [11.0, 0.0, 13.0, 2.0, 17.0, 4.0, 15.0, 20.0],
+    #                          [5.0, 13.0, 0.0, 14.0, 1.0, 15.0, 12.0, 12.0],
+    #                          [12.0, 2.0, 14.0, 0.0, 18.0, 5.0, 16.0, 21.0],
+    #                          [7.0, 17.0, 1.0, 18.0, 0.0, 20.0, 15.0, 17.0],
+    #                          [13.0, 4.0, 15.0, 5.0, 20.0, 0.0, 19.0, 22.0],
+    #                          [9.0, 15.0, 12.0, 16.0, 15.0, 19.0, 0.0, 30.0],
+    #                          [11.0, 20.0, 12.0, 21.0, 17.0, 22.0, 30.0, 0.0]])
+    dist_matrix = np.array([[0.0, 1.0, 4.0, 5.10],
+                            [1.0, 0.0, 3.0, 4.12],
+                            [4.0, 3.0, 0.0, 1.41],
+                            [5.10, 4.12, 1.41, 0.0]])
     print(dist_matrix)
     # plot the distance matrix:
     # dist_matrix.draw() this doesn't work anymore
 
     # initialize a temporal VNC clusterer, here with the Ward linkage method:
-    clusterer = Clusterer(dist_matrix, linkage='average')
+    clusterer = Clusterer(dist_matrix, linkage='median')
     # could also be a plain Clusterer()
 
     # start the clustering procedure:
