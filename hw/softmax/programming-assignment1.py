@@ -58,14 +58,14 @@ def compute_softmax_loss(W, X, y, reg):
     dW = np.zeros_like(W)
     num_train = X.shape[0]
     num_class = W.shape[1]
-    for i in xrange(num_train):
+    for i in range(num_train):
         score = X[i, :].dot(W)
         score -= np.max(score)
         correct_score = score[y[i]]
         exp_sum = np.sum(np.exp(score))
         p = np.exp(correct_score) / exp_sum
         loss += -np.log(p)
-        for j in xrange(num_class):
+        for j in range(num_class):
             if j == y[i]:
                 dW[:, j] += np.exp(score[j]) / exp_sum * X[i, :] - X[i, :]
             else:
