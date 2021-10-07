@@ -1,25 +1,24 @@
 """
-           Programming Assignment 1
-         
-
+Programming Assignment 1
 This program learns a softmax model for the Iris dataset (included).
 There is a function, compute_softmax_loss, that computes the
 softmax loss and the gradient. It is left empty. Your task is to write
 the function.
-     
+
+Student Name: YE, Qiming
+Student ID: 20807296
+Assignment: progamming-assignment1
+Student Email: qyeaf@connect.ust.hk
+Course Name: CSIT5910
 """
+
 import numpy as np
 import os
 import math
 
 # Data sets
-# IRIS_TRAINING = "iris_data/iris_training.csv"
-# IRIS_TEST = "iris_data/iris_test.csv"
-from sklearn.externals._arff import xrange
-
-IRIS_TRAINING = "D:\hkust\lesson\project\hkust_machine_learning\hw\softmax\iris_training.csv"
-IRIS_TEST = "D:\hkust\lesson\project\hkust_machine_learning\hw\softmax\iris_test.csv"
-
+IRIS_TRAINING = "iris_data/iris_training.csv"
+IRIS_TEST = "iris_data/iris_test.csv"
 
 def get_data():
     # Load datasets.
@@ -45,7 +44,6 @@ def compute_softmax_loss(W, X, y, reg):
 
     Returns:
     - softmax loss: NLL/N +  0.5 *reg* L2 regularization,
-            
     - dW: the gradient for W.
     """
     #############################################################################
@@ -59,6 +57,7 @@ def compute_softmax_loss(W, X, y, reg):
     num_train = X.shape[0]
     num_class = W.shape[1]
     for i in range(num_train):
+        # compute score using weight matrix
         score = X[i, :].dot(W)
         score -= np.max(score)
         correct_score = score[y[i]]
@@ -66,10 +65,12 @@ def compute_softmax_loss(W, X, y, reg):
         p = np.exp(correct_score) / exp_sum
         loss += -np.log(p)
         for j in range(num_class):
+            # calculate dW
             if j == y[i]:
                 dW[:, j] += np.exp(score[j]) / exp_sum * X[i, :] - X[i, :]
             else:
                 dW[:, j] += (np.exp(score[j]) / exp_sum) * X[i]
+    # softmax loss: NLL / N + 0.5 * reg * L2 regularization
     loss /= num_train
     loss += 0.5 * reg * np.sum(W * W)
     dW /= num_train
@@ -156,8 +157,8 @@ W = train(train_x, train_y, test_x, test_y, learning_rate, reg, max_epochs, batc
 # Classify two new flower samples.
 def new_samples():
     return np.array(
-        [[6.4, 3.2, 4.5, 1.5],
-         [5.8, 3.1, 5.0, 1.7]], dtype=np.float32)
+      [[6.4, 3.2, 4.5, 1.5],
+       [5.8, 3.1, 5.0, 1.7]], dtype=np.float32)
 
 
 new_x = new_samples()
