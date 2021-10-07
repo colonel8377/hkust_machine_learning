@@ -10,21 +10,21 @@ def load_data_set():
     fr = open(filename)
     for line in fr.readlines():
         line_arr = line.strip().split()
-        data_mat.append([1.0, double(line_arr[0]), double(line_arr[1]), double(line_arr[2])])
-        label_mat.append(int(line_arr[3]))
+        data_mat.append([1.0, double(line_arr[0]), double(line_arr[1])])
+        label_mat.append(int(line_arr[2]))
     return data_mat, label_mat
 
 
 def sigmoid(in_x):
-    return 1.0 / (1 + exp(-in_x))
+    return np.where((1.0 / (1 + exp(-in_x))) >= 0.5, 1, 0)
+    # return 1.0 / (1 + exp(-in_x))
 
 
 def grad_ascent(data_mat, label_mat, weights, max_cycle, alpha):
     data_matrix = mat(data_mat)
-    class_label = mat(label_mat)
+    class_label = mat(label_mat).transpose()
     m, n = shape(data_matrix)
     weight = mat(weights).transpose()
-    print(weight.shape)
 
     # weights = ones((n, 1))
     error = 0
@@ -32,7 +32,8 @@ def grad_ascent(data_mat, label_mat, weights, max_cycle, alpha):
         h = sigmoid(data_matrix * weight)
         error = (class_label - h)
         weight = weight + alpha * (1/m) * (error.transpose() * data_matrix).transpose()
-    return weight
+        # print(weight)
+    return weight,error
 
 
 def plot_base_fit(weights):  # 画出最终分类的图
@@ -64,17 +65,20 @@ def plot_base_fit(weights):  # 画出最终分类的图
 
 
 def main():
-    data_mat = np.random.randint(0, 10, (100, 15))
-    data_mat[:, 0] = 0
-    label_mat = np.random.randint(0, 100, (100, 1))
-    for i in range(5):
-        data_mat[random.randint(0, 100)][0] = 1
-    loops = 100000
+    # data_mat = np.random.randint(0, 10, (100, 15))
+    # data_mat[:, 0] = 0
+    # label_mat = np.random.randint(0, 100, (100, 1))
+    # for i in range(5):
+    #     data_mat[random.randint(0, 100)][0] = 1
+    data_mat, label_mat = load_data_set()
+    loops = 1000000
     print('Number of loops ' + str(loops))
-    weight = grad_ascent(data_mat, label_mat, [1] * 15, loops, 0.1)
+    weight,error = grad_ascent(data_mat, label_mat, [1, -1.5, -1.5], loops, 0.1)
+    # weight, error = grad_ascent(data_mat, label_mat, [1, 1, 1, 1], loops, 0.1)
     # plot_base_fit(weights)
     np.set_printoptions(threshold=np.inf)
     print(weight.getA().transpose())
+    print(error)
     # plot_base_fit(weights)
 
 
