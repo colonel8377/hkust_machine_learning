@@ -251,3 +251,8 @@ new_x = new_samples()
 predictions = predict(params, new_x)
 
 print("New Samples, Class Predictions:    {}\n".format(predictions))
+
+if __name__ == '__main__':
+    a = 1.0
+    res = (math.exp(a) - math.exp(-a)) / (math.exp(a) + math.exp(-a))
+    print(res)
