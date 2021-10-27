@@ -112,7 +112,6 @@ def prepare_optimizer(_net):
                                  weight_decay=args.weight_decay),
         'Rprop': optim.Rprop(_net.parameters(), lr=args.lr),
         'Adadelta': optim.Adadelta(_net.parameters(), lr=args.lr, weight_decay=args.weight_decay),
-        'RAdam': optim.RAdam(_net.parameters(), lr=args.lr, weight_decay=args.weight_decay),
     }
     _optimizer = optimizers_dict.get(args.optimizers, optim.Adam(_net.parameters(), lr=args.lr))
     print('==> Preparing scheduler...')
