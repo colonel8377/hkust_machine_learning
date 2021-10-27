@@ -21,6 +21,7 @@ def get_mean_and_std(dataset):
     std.div_(len(dataset))
     return mean, std
 
+
 def init_params(net):
     '''Init layer parameters.'''
     for m in net.modules():
@@ -37,11 +38,13 @@ def init_params(net):
                 init.constant(m.bias, 0)
 
 
-term_width = 80
+term_width = 100
 
 TOTAL_BAR_LENGTH = 65.
 last_time = time.time()
 begin_time = last_time
+
+
 def progress_bar(current, total, msg=None):
     global last_time, begin_time
     if current == 0:
@@ -84,6 +87,7 @@ def progress_bar(current, total, msg=None):
     else:
         sys.stdout.write('\n')
     sys.stdout.flush()
+
 
 def format_time(seconds):
     days = int(seconds / 3600/24)
