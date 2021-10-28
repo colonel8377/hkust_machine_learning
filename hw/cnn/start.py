@@ -15,6 +15,8 @@ from train import train, test
 # Training settings
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR Example')
+parser.add_argument('--data_dir', type=str, default='./data', metavar='DIR',
+                    help='input data dir (default ./data)')
 parser.add_argument('--batch-size', type=int, default=128, metavar='N',
                     help='input batch size for training (default: 128)')
 parser.add_argument('--optimizers', type=str, default='Adam', metavar='OP',
@@ -63,7 +65,7 @@ def prepare_device():
     return device
 
 
-def prepare_data():
+def prepare_data(data_dir):
     # Data
     print('==> Preparing data..')
     transform_train = transforms.Compose([
@@ -77,9 +79,9 @@ def prepare_data():
         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
     ])
     trainset = torchvision.datasets.CIFAR10(
-        root='./data', train=True, download=True, transform=transform_train)
+        root=data_dir, train=True, download=True, transform=transform_train)
     testset = torchvision.datasets.CIFAR10(
-        root='./data', train=False, download=True, transform=transform_test)
+        root=data_dir, train=False, download=True, transform=transform_test)
     testloader = torch.utils.data.DataLoader(
         testset, batch_size=100, shuffle=False, num_workers=2)
     trainloader = torch.utils.data.DataLoader(
@@ -125,7 +127,7 @@ def run(train_loader, test_loader, _device, _criterion, _optimizer, _scheduler):
         print(str(k) + '------' + str(args.__dict__[k]))
     for epoch in range(start_epoch, start_epoch + args.epochs):
         train(epoch, _optimizer, net, train_loader, _device, _criterion)
-        test(epoch, net, test_loader, _device, _criterion)
+        test(epoch, net, test_loader, _device, _criterion, best_acc)
         _scheduler.step()
 
 
@@ -142,5 +144,5 @@ if __name__ == '__main__':
         net.load_state_dict(checkpoint['net'])
         best_acc = checkpoint['acc']
         start_epoch = checkpoint['epoch']
-    trainloader, testloader = prepare_data()
+    trainloader, testloader = prepare_data(args.data_dir)
     run(trainloader, testloader, device, criterion, optimizer, scheduler)

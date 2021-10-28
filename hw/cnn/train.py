@@ -1,9 +1,19 @@
 # Training
+import logging
 import os
 
 import torch
 
 from utils import progress_bar
+from logging import handlers
+
+if not os.path.isdir('logs'):
+    os.mkdir('./logs')
+fmt = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt="%m/%d/%Y %H:%M:%S %p")
+rh = logging.handlers.RotatingFileHandler(filename='./logs/cifar.log', mode='a', maxBytes=204800, backupCount=7)
+rh.setFormatter(fmt=fmt)
+logger = logging.getLogger(__name__)
+logger.addHandler(rh)
 
 
 def train(epoch, op, model, trainloader, device, criterion):
@@ -25,14 +35,16 @@ def train(epoch, op, model, trainloader, device, criterion):
         correct += predicted.eq(targets).sum().item()
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
+        logger.info('Train: Loss: %.3f | Acc: %.3f%% (%d/%d)' % (train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
 
 
-def test(epoch, model, testloader, device, criterion):
-    global best_acc
+def test(epoch, model, testloader, device, criterion, best_acc):
     model.eval()
     test_loss = 0
     correct = 0
     total = 0
+    if not os.path.isdir('log'):
+        os.mkdir('log')
     with torch.no_grad():
         for batch_idx, (inputs, targets) in enumerate(testloader):
             inputs, targets = inputs.to(device), targets.to(device)
@@ -47,6 +59,8 @@ def test(epoch, model, testloader, device, criterion):
             progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                          % (test_loss / (batch_idx + 1), 100. * correct / total, correct, total))
 
+            logger.info('Test: Loss: %.3f | Acc: %.3f%% (%d/%d)' % (test_loss / (batch_idx + 1), 100. * correct / total, correct, total))
+
     # Save checkpoint.
     acc = 100. * correct / total
     if acc > best_acc:
@@ -58,5 +72,8 @@ def test(epoch, model, testloader, device, criterion):
         }
         if not os.path.isdir('checkpoint'):
             os.mkdir('checkpoint')
+        if not os.path.isdir('outputs'):
+            os.mkdir('outputs')
         torch.save(state, './checkpoint/ckpt.pth')
+        torch.save(state, './outputs/ckpt.pth')
         best_acc = acc
