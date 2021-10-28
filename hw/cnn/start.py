@@ -92,7 +92,8 @@ def build_model(_device, _net):
     print('==> Building net..')
     _net = _net.to(_device)
     if _device == 'cuda':
-        _net = torch.nn.DataParallel(_net)
+        if torch.cuda.device_count() > 1:
+            _net = torch.nn.DataParallel(_net)
     cudnn.benchmark = True
     return _net
 
