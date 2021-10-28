@@ -1,20 +1,27 @@
 from __future__ import print_function
 
 import argparse
-import os
+import logging
 import multiprocessing
+import os
+from logging import handlers
+
 import torch
 import torchvision
 from torch import optim, nn
 from torch.backends import cudnn
+from torch.utils.data._utils.pin_memory import pin_memory
 from torchvision import transforms
 
 from models import DLA
 from train import train, test
 
-# Training settings
+logger = logging.getLogger(__name__)
 
+# Training settings
 parser = argparse.ArgumentParser(description='PyTorch CIFAR Example')
+parser.add_argument('--env', type=str, default='dev', metavar='DIR',
+                    help='input data dir (default ./data)')
 parser.add_argument('--data_dir', type=str, default='./data', metavar='DIR',
                     help='input data dir (default ./data)')
 parser.add_argument('--batch-size', type=int, default=128, metavar='N',
@@ -58,6 +65,17 @@ torch.set_num_threads(num_processors)
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 
+def prepare_log():
+    # logging
+    rh = logging.handlers.RotatingFileHandler(filename='./logs/cifar.log', mode='a', maxBytes=204800, backupCount=7)
+    logging.basicConfig(
+        level=logging.getLevelName('INFO'),
+        format='%(asctime)s.%(msecs)03d [%(levelname)s] %(process)d %(name)s %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
+        handlers=[rh],
+    )
+
+
 # Set device
 def prepare_device():
     use_cuda = args.cuda and torch.cuda.is_available()
@@ -65,7 +83,7 @@ def prepare_device():
     return device
 
 
-def prepare_data(data_dir):
+def prepare_data(data_dir, _device_nums):
     # Data
     print('==> Preparing data..')
     transform_train = transforms.Compose([
@@ -82,22 +100,25 @@ def prepare_data(data_dir):
         root=data_dir, train=True, download=True, transform=transform_train)
     testset = torchvision.datasets.CIFAR10(
         root=data_dir, train=False, download=True, transform=transform_test)
-    testloader = torch.utils.data.DataLoader(
-        testset, batch_size=100, shuffle=False, num_workers=2)
-    trainloader = torch.utils.data.DataLoader(
-        trainset, batch_size=args.batch_size, shuffle=True, num_workers=2)
-    return trainloader, testloader
+    _testloader = torch.utils.data.DataLoader(
+        testset, batch_size=100, shuffle=False, num_workers=_device_nums * 4 if _device_nums > 0 else 4,
+        pin_memory=(args.env != 'dev'))
+    _trainloader = torch.utils.data.DataLoader(
+        trainset, batch_size=args.batch_size, shuffle=True, num_workers=_device_nums * 4 if _device_nums > 0 else 4,
+        pin_memory=(args.env != 'dev'))
+    return _trainloader, _testloader
 
 
 def build_model(_device, _net):
     # net
     print('==> Building net..')
     _net = _net.to(_device)
+    _device_nums = torch.cuda.device_count()
     if _device == 'cuda':
-        if torch.cuda.device_count() > 1:
+        if _device_nums > 1:
             _net = torch.nn.DataParallel(_net)
     cudnn.benchmark = True
-    return _net
+    return _net, _device_nums
 
 
 criterion = nn.CrossEntropyLoss()
@@ -115,6 +136,7 @@ def prepare_optimizer(_net):
                                  weight_decay=args.weight_decay),
         'Rprop': optim.Rprop(_net.parameters(), lr=args.lr),
         'Adadelta': optim.Adadelta(_net.parameters(), lr=args.lr, weight_decay=args.weight_decay),
+        'AdamW': optim.AdamW(_net.parameters(), lr=args.lr, weight_decay=args.weight_decay),
     }
     _optimizer = optimizers_dict.get(args.optimizers, optim.Adam(_net.parameters(), lr=args.lr))
     print('==> Preparing scheduler...')
@@ -132,8 +154,11 @@ def run(train_loader, test_loader, _device, _criterion, _optimizer, _scheduler):
 
 
 if __name__ == '__main__':
+    if not os.path.isdir('logs'):
+        os.mkdir('./logs')
+    prepare_log()
     device = prepare_device()
-    net = build_model(device, DLA())
+    net, device_nums = build_model(device, DLA())
     optimizer, scheduler = prepare_optimizer(net)
 
     if args.resume:
@@ -144,5 +169,5 @@ if __name__ == '__main__':
         net.load_state_dict(checkpoint['net'])
         best_acc = checkpoint['acc']
         start_epoch = checkpoint['epoch']
-    trainloader, testloader = prepare_data(args.data_dir)
+    trainloader, testloader = prepare_data(args.data_dir, device_nums)
     run(trainloader, testloader, device, criterion, optimizer, scheduler)
