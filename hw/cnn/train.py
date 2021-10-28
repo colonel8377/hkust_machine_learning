@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 best_acc = 0
 
 
-def train(epoch, op, model, trainloader, device, criterion):
+def train(model, epoch, op, trainloader, device, criterion):
     print('\nEpoch: %d' % epoch)
     model.train()
     train_loss = 0
@@ -35,8 +35,9 @@ def train(epoch, op, model, trainloader, device, criterion):
                 train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
 
 
-def test(epoch, model, testloader, device, criterion):
+def test(model, epoch, testloader, device, criterion, _best_acc):
     global best_acc
+    best_acc = _best_acc
     model.eval()
     test_loss = 0
     correct = 0
@@ -72,14 +73,3 @@ def test(epoch, model, testloader, device, criterion):
         torch.save(state, './checkpoint/ckpt.pth')
         torch.save(state, './outputs/ckpt.pth')
         best_acc = acc
-
-
-# predict function
-def predict(model, device, image_datas):
-    with torch.no_grad():
-        for image_data in image_datas:
-            inputs = image_data.to(device)
-            outputs = model(inputs)
-            score, predicted = outputs.max(1)
-            print(score)
-            print(predicted)
