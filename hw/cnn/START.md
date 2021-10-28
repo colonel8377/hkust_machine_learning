@@ -25,10 +25,11 @@ az ml compute create -n gpu-cluster --type amlcompute --min-instances 0 --max-in
 - [详情参考](https://docs.microsoft.com/zh-cn/azure/machine-learning/how-to-train-cli#prerequisites)
 
 ### Model
-[参考来源](https://github.com/kuangliu/pytorch-cifar)
+- [参考来源](https://github.com/kuangliu/pytorch-cifar)
+- [数据来源](http://www.cs.toronto.edu/~kriz/learning-features-2009-TR.pdf)
 
 | Model             | Acc.        |
-| ----------------- | ----------- |
+| ---------------------- | ------------------------ |
 | [VGG16](https://arxiv.org/abs/1409.1556)              | 92.64%      |
 | [ResNet18](https://arxiv.org/abs/1512.03385)          | 93.02%      |
 | [ResNet50](https://arxiv.org/abs/1512.03385)          | 93.62%      |

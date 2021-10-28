@@ -6,15 +6,16 @@ import multiprocessing
 import os
 from logging import handlers
 
+import cv2
+import numpy
 import torch
 import torchvision
 from torch import optim, nn
 from torch.backends import cudnn
-from torch.utils.data._utils.pin_memory import pin_memory
 from torchvision import transforms
 
 from models import DLA
-from train import train, test
+from train import train, test, predict
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,8 @@ parser.add_argument('--batch-size', type=int, default=128, metavar='N',
 parser.add_argument('--optimizers', type=str, default='Adam', metavar='OP',
                     help='optimizers for training (default: Adam)')
 parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
+                    help='input batch size for testing (default: 1000)')
+parser.add_argument('--predict-batch-size', type=int, default=128, metavar='N',
                     help='input batch size for testing (default: 1000)')
 parser.add_argument('--epochs', type=int, default=10, metavar='N',
                     help='number of epochs to train (default: 10)')
@@ -56,12 +59,14 @@ parser.add_argument('--dry-run', action='store_true', default=False,
                     help='quickly check a single pass')
 parser.add_argument('--resume', '-r', action='store_true', default=False,
                     help='resume from checkpoint')
+parser.add_argument('--stage', type=str, default='train', metavar='STAGE',
+                    help='stage (enum: train, test, predict, eval)')
 args = parser.parse_args()
 best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 num_processors = multiprocessing.cpu_count()
-torch.set_num_threads(num_processors)
-
+torch.set_num_threads(num_processors * 2)
+IMAGE_SIZE = 32
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 
@@ -149,25 +154,63 @@ def run(train_loader, test_loader, _device, _criterion, _optimizer, _scheduler):
         print(str(k) + '------' + str(args.__dict__[k]))
     for epoch in range(start_epoch, start_epoch + args.epochs):
         train(epoch, _optimizer, net, train_loader, _device, _criterion)
-        test(epoch, net, test_loader, _device, _criterion, best_acc)
+        test(epoch, net, test_loader, _device, _criterion)
         _scheduler.step()
+
+
+def predict_image(predict_path, model, _device):
+    assert os.path.isdir(predict_path)
+    image_datas = prepare_prediction(predict_path + '/', os.listdir(predict_path))
+    predict(model, device, image_datas)
+
+
+def prepare_prediction(base, filenames):
+    height = IMAGE_SIZE
+    width = IMAGE_SIZE
+    images = []
+    for filename in filenames:
+        if not filename.endswith('jpg') and not filename.endswith('jpeg') and not filename.endswith('png'):
+            continue
+        image = cv2.imdecode(numpy.fromfile(base + filename, dtype=numpy.uint8), cv2.IMREAD_COLOR)
+        image = cv2.resize(image, (height, width))
+        transform_pred = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+        image = transform_pred(image).unsqueeze(0)
+        images.append(image)
+    return images
 
 
 if __name__ == '__main__':
     if not os.path.isdir('logs'):
-        os.mkdir('./logs')
+        os.mkdir('logs')
+    if not os.path.isdir('checkpoint'):
+        os.mkdir('checkpoint')
+    if not os.path.isdir('outputs'):
+        os.mkdir('outputs')
     prepare_log()
     device = prepare_device()
     net, device_nums = build_model(device, DLA())
     optimizer, scheduler = prepare_optimizer(net)
-
-    if args.resume:
-        # Load checkpoint.
-        print('==> Resuming from checkpoint..')
-        assert os.path.isdir('checkpoint'), 'Error: no checkpoint directory found!'
-        checkpoint = torch.load('./checkpoint/ckpt.pth')
+    if args.stage == 'predict':
+        print('==> predicting from checkpoint..')
+        assert os.path.isdir('outputs'), 'Error: no checkpoint directory found!'
+        checkpoint = torch.load('./outputs/ckpt.pth', map_location=torch.device(device))
         net.load_state_dict(checkpoint['net'])
         best_acc = checkpoint['acc']
         start_epoch = checkpoint['epoch']
-    trainloader, testloader = prepare_data(args.data_dir, device_nums)
-    run(trainloader, testloader, device, criterion, optimizer, scheduler)
+        predict_image('predict', net, device)
+    elif args.stage == 'train':
+        if args.resume:
+            # Load checkpoint.
+            print('==> Resuming from checkpoint..')
+            assert os.path.isdir('checkpoint'), 'Error: no checkpoint directory found!'
+            checkpoint = torch.load('./checkpoint/ckpt.pth')
+            net.load_state_dict(checkpoint['net'])
+            best_acc = checkpoint['acc']
+            start_epoch = checkpoint['epoch']
+        trainloader, testloader = prepare_data(args.data_dir, device_nums)
+        run(trainloader, testloader, device, criterion, optimizer, scheduler)
+    else:
+        pass

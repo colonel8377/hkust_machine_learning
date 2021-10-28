@@ -7,3 +7,7 @@ mypy
 numpy~=1.19.2
 scikit-learn~=0.23.1
 matplotlib~=3.3.4
+torch~=1.10.0
+torchvision~=0.11.1
+opencv-python~=4.5.4.58
+tensorflow~=2.3.0

@@ -8,6 +8,8 @@ from utils import progress_bar
 
 logger = logging.getLogger(__name__)
 
+best_acc = 0
+
 
 def train(epoch, op, model, trainloader, device, criterion):
     print('\nEpoch: %d' % epoch)
@@ -33,7 +35,8 @@ def train(epoch, op, model, trainloader, device, criterion):
                 train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
 
 
-def test(epoch, model, testloader, device, criterion, best_acc):
+def test(epoch, model, testloader, device, criterion):
+    global best_acc
     model.eval()
     test_loss = 0
     correct = 0
@@ -66,10 +69,17 @@ def test(epoch, model, testloader, device, criterion, best_acc):
             'acc': acc,
             'epoch': epoch,
         }
-        if not os.path.isdir('checkpoint'):
-            os.mkdir('checkpoint')
-        if not os.path.isdir('outputs'):
-            os.mkdir('outputs')
         torch.save(state, './checkpoint/ckpt.pth')
         torch.save(state, './outputs/ckpt.pth')
         best_acc = acc
+
+
+# predict function
+def predict(model, device, image_datas):
+    with torch.no_grad():
+        for image_data in image_datas:
+            inputs = image_data.to(device)
+            outputs = model(inputs)
+            score, predicted = outputs.max(1)
+            print(score)
+            print(predicted)
