@@ -11,6 +11,11 @@ logger = logging.getLogger(__name__)
 best_acc = 0
 
 
+def init_best_acc(_best_acc):
+    global best_acc
+    best_acc = _best_acc
+
+
 def train(model, epoch, op, trainloader, device, criterion):
     print('\nEpoch: %d' % epoch)
     model.train()
@@ -35,9 +40,8 @@ def train(model, epoch, op, trainloader, device, criterion):
                 train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
 
 
-def test(model, epoch, testloader, device, criterion, _best_acc):
+def test(model, epoch, testloader, device, criterion):
     global best_acc
-    best_acc = _best_acc
     model.eval()
     test_loss = 0
     correct = 0

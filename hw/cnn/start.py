@@ -13,7 +13,7 @@ from torch.backends import cudnn
 from torchvision import transforms
 
 from models import DLA
-from train import train, test
+from train import train, test, init_best_acc
 
 logger = logging.getLogger(__name__)
 
@@ -148,9 +148,10 @@ def prepare_optimizer(_net):
 def run(_net, train_loader, test_loader, _device, _criterion, _optimizer, _scheduler, _best_acc, _start_epoch):
     for k in args.__dict__:
         print(str(k) + '------' + str(args.__dict__[k]))
+    init_best_acc(_best_acc)
     for epoch in range(_start_epoch, _start_epoch + args.epochs):
         train(_net, epoch, _optimizer, train_loader, _device, _criterion)
-        test(_net, epoch, test_loader, _device, _criterion, _best_acc)
+        test(_net, epoch, test_loader, _device, _criterion)
         _scheduler.step()
 
 
