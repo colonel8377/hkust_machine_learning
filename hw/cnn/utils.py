@@ -38,7 +38,7 @@ def init_params(net):
                 init.constant(m.bias, 0)
 
 
-term_width = 100
+term_width = 80
 
 TOTAL_BAR_LENGTH = 65.
 last_time = time.time()

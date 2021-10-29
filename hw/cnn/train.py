@@ -18,6 +18,7 @@ def init_best_acc(_best_acc):
 
 def train(model, epoch, op, trainloader, device, criterion):
     print('\nEpoch: %d' % epoch)
+    logger.info('Epoch: %d' % epoch)
     model.train()
     train_loss = 0
     correct = 0

@@ -4,7 +4,9 @@ import argparse
 import logging
 import multiprocessing
 import os
+import queue
 from logging import handlers
+from logging.handlers import QueueHandler, QueueListener
 
 import torch
 import torchvision
@@ -14,6 +16,9 @@ from torchvision import transforms
 
 from models import DLA
 from train import train, test, init_best_acc
+
+que = queue.Queue(-1)
+queue_handler = QueueHandler(que) # no limit on size
 
 logger = logging.getLogger(__name__)
 
@@ -31,8 +36,10 @@ parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                     help='input batch size for testing (default: 1000)')
 parser.add_argument('--predict-batch-size', type=int, default=128, metavar='N',
                     help='input batch size for testing (default: 1000)')
-parser.add_argument('--epochs', type=int, default=10, metavar='N',
-                    help='number of epochs to train (default: 10)')
+parser.add_argument('--end_epoch', type=int, default=128, metavar='ENDEPOCHS',
+                    help='number of end-epochs to train (default: 10)')
+parser.add_argument('--test', action='store_true', default=False,
+                    help='quickly test')
 parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
                     help='learning rate (default: 0.01)')
 parser.add_argument('--lr_decay', type=float, default=0.0, metavar='LRDECAY',
@@ -63,7 +70,6 @@ start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 num_processors = multiprocessing.cpu_count()
 torch.set_num_threads(num_processors * 2)
 IMAGE_SIZE = 32
-classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 
 def prepare_log():
@@ -75,6 +81,8 @@ def prepare_log():
         datefmt='%Y-%m-%d %H:%M:%S',
         handlers=[rh],
     )
+    _listener = QueueListener(que, rh)
+    return _listener
 
 
 # Set device
@@ -149,10 +157,13 @@ def run(_net, train_loader, test_loader, _device, _criterion, _optimizer, _sched
     for k in args.__dict__:
         print(str(k) + '------' + str(args.__dict__[k]))
     init_best_acc(_best_acc)
-    for epoch in range(_start_epoch, _start_epoch + args.epochs):
-        train(_net, epoch, _optimizer, train_loader, _device, _criterion)
-        test(_net, epoch, test_loader, _device, _criterion)
-        _scheduler.step()
+    if not args.test:
+        for epoch in range(_start_epoch, args.end_epoch):
+            train(_net, epoch, _optimizer, train_loader, _device, _criterion)
+            test(_net, epoch, test_loader, _device, _criterion)
+            _scheduler.step()
+    else:
+        test(_net, start_epoch, test_loader, _device, _criterion)
 
 
 if __name__ == '__main__':
@@ -162,17 +173,19 @@ if __name__ == '__main__':
         os.mkdir('checkpoint')
     if not os.path.isdir('outputs'):
         os.mkdir('outputs')
-    prepare_log()
+    listener = prepare_log()
+    listener.start()
     device = prepare_device()
     net, device_nums = build_model(device, DLA())
     if args.resume:
         # Load checkpoint.
         print('==> Resuming from checkpoint..')
         assert os.path.isdir('checkpoint'), 'Error: no checkpoint directory found!'
-        checkpoint = torch.load('./checkpoint/ckpt.pth')
+        checkpoint = torch.load('./checkpoint/ckpt.pth', map_location=torch.device(device))
         net.load_state_dict(checkpoint['net'])
         best_acc = checkpoint['acc']
         start_epoch = checkpoint['epoch']
     optimizer, scheduler = prepare_optimizer(net)
     trainloader, testloader = prepare_data(args.data_dir, device_nums)
     run(net, trainloader, testloader, device, criterion, optimizer, scheduler, best_acc, start_epoch)
+    listener.stop()

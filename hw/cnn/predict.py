@@ -2,11 +2,16 @@ import os
 
 import numpy
 import torch
+import torch.nn.functional as F
+
 from cv2 import cv2
 from torchvision import transforms
 
 from models import DLA
 from start import prepare_device, build_model, IMAGE_SIZE
+
+
+classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 
 def predict_image(predict_path, model, _device):
@@ -34,14 +39,18 @@ def prepare_prediction(base, filenames):
 
 
 # predict function
-def predict(model, device, image_datas):
+def predict(model, _device, image_datas):
     with torch.no_grad():
         for image_data in image_datas:
-            inputs = image_data.to(device)
+            inputs = image_data.to(_device)
             outputs = model(inputs)
-            score, predicted = outputs.max(1)
+            score, predicted = torch.max(outputs.data, 1)
+            prob = F.softmax(outputs, dim=1)
+            print(prob)
+            print(predicted.item())
             print(score)
-            print(predicted)
+            pred_class = classes[predicted.item()]
+            print(pred_class)
 
 
 if __name__ == '__main__':
@@ -53,4 +62,5 @@ if __name__ == '__main__':
     net.load_state_dict(checkpoint['net'])
     best_acc = checkpoint['acc']
     start_epoch = checkpoint['epoch']
+    net.eval()
     predict_image('predict', net, device)
