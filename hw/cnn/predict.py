@@ -35,6 +35,7 @@ def prepare_prediction(base, filenames):
         ])
         image = transform_pred(image).unsqueeze(0)
         images.append(image)
+    print(filenames)
     return images
 
 

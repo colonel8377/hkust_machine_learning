@@ -4,23 +4,16 @@ import argparse
 import logging
 import multiprocessing
 import os
-import queue
-from logging import handlers
-from logging.handlers import QueueHandler, QueueListener
 
 import torch
 import torchvision
 from torch import optim, nn
 from torch.backends import cudnn
 from torchvision import transforms
-
 from models import DLA
 from train import train, test, init_best_acc
+from concurrent_log_handler import ConcurrentRotatingFileHandler
 
-que = queue.Queue(-1)
-queue_handler = QueueHandler(que) # no limit on size
-
-logger = logging.getLogger(__name__)
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch CIFAR Example')
@@ -36,7 +29,7 @@ parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                     help='input batch size for testing (default: 1000)')
 parser.add_argument('--predict-batch-size', type=int, default=128, metavar='N',
                     help='input batch size for testing (default: 1000)')
-parser.add_argument('--end_epoch', type=int, default=128, metavar='ENDEPOCHS',
+parser.add_argument('--end_epochs', type=int, default=128, metavar='ENDEPOCHS',
                     help='number of end-epochs to train (default: 10)')
 parser.add_argument('--test', action='store_true', default=False,
                     help='quickly test')
@@ -73,23 +66,26 @@ IMAGE_SIZE = 32
 
 
 def prepare_log():
-    # logging
-    rh = logging.handlers.RotatingFileHandler(filename='./logs/cifar.log', mode='a', maxBytes=204800, backupCount=7)
+    # send all messages, for demo; no other level or filter logic applied.
+    file_handler = ConcurrentRotatingFileHandler(
+        filename='./logs/cifar.log',
+        mode='a',
+        maxBytes=1024 * 1024 * 500,
+        backupCount=7,
+        encoding='utf-8',
+    )
     logging.basicConfig(
         level=logging.getLevelName('INFO'),
         format='%(asctime)s.%(msecs)03d [%(levelname)s] %(process)d %(name)s %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S',
-        handlers=[rh],
+        handlers=[file_handler],
     )
-    _listener = QueueListener(que, rh)
-    return _listener
 
 
 # Set device
 def prepare_device():
     use_cuda = args.cuda and torch.cuda.is_available()
-    device = torch.device("cuda" if use_cuda else "cpu")
-    return device
+    return torch.device("cuda" if use_cuda else "cpu")
 
 
 def prepare_data(data_dir, _device_nums):
@@ -106,9 +102,9 @@ def prepare_data(data_dir, _device_nums):
         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
     ])
     trainset = torchvision.datasets.CIFAR10(
-        root=data_dir, train=True, download=True, transform=transform_train)
+        root=data_dir, train=True, download=False, transform=transform_train)
     testset = torchvision.datasets.CIFAR10(
-        root=data_dir, train=False, download=True, transform=transform_test)
+        root=data_dir, train=False, download=False, transform=transform_test)
     _testloader = torch.utils.data.DataLoader(
         testset, batch_size=100, shuffle=False, num_workers=_device_nums * 6 if _device_nums > 0 else 4,
         pin_memory=(args.env != 'dev'))
@@ -158,7 +154,7 @@ def run(_net, train_loader, test_loader, _device, _criterion, _optimizer, _sched
         print(str(k) + '------' + str(args.__dict__[k]))
     init_best_acc(_best_acc)
     if not args.test:
-        for epoch in range(_start_epoch, args.end_epoch):
+        for epoch in range(_start_epoch, args.end_epochs):
             train(_net, epoch, _optimizer, train_loader, _device, _criterion)
             test(_net, epoch, test_loader, _device, _criterion)
             _scheduler.step()
@@ -173,8 +169,7 @@ if __name__ == '__main__':
         os.mkdir('checkpoint')
     if not os.path.isdir('outputs'):
         os.mkdir('outputs')
-    listener = prepare_log()
-    listener.start()
+    prepare_log()
     device = prepare_device()
     net, device_nums = build_model(device, DLA())
     if args.resume:
@@ -188,4 +183,3 @@ if __name__ == '__main__':
     optimizer, scheduler = prepare_optimizer(net)
     trainloader, testloader = prepare_data(args.data_dir, device_nums)
     run(net, trainloader, testloader, device, criterion, optimizer, scheduler, best_acc, start_epoch)
-    listener.stop()

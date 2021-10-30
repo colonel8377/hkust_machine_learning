@@ -5,10 +5,13 @@ import os
 import torch
 
 from utils import progress_bar
+from torch.utils.tensorboard import SummaryWriter
+
 
 logger = logging.getLogger(__name__)
 
 best_acc = 0
+writer = SummaryWriter('./run')
 
 
 def init_best_acc(_best_acc):
@@ -31,14 +34,17 @@ def train(model, epoch, op, trainloader, device, criterion):
         loss.backward()
         op.step()
         train_loss += loss.item()
+
         _, predicted = outputs.max(1)
         total += targets.size(0)
+        writer.add_scalar("Loss/train", loss, total, epoch)
         correct += predicted.eq(targets).sum().item()
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
         if total % 100 == 0:
             logger.info('Train: Loss: %.3f | Acc: %.3f%% (%d/%d)' % (
                 train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
+    writer.flush()
 
 
 def test(model, epoch, testloader, device, criterion):
@@ -56,8 +62,10 @@ def test(model, epoch, testloader, device, criterion):
             loss = criterion(outputs, targets)
 
             test_loss += loss.item()
+
             _, predicted = outputs.max(1)
             total += targets.size(0)
+            writer.add_scalar("Loss/test", loss, total, epoch)
             correct += predicted.eq(targets).sum().item()
 
             progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
@@ -65,7 +73,7 @@ def test(model, epoch, testloader, device, criterion):
             if total % 100 == 0:
                 logger.info('Test: Loss: %.3f | Acc: %.3f%% (%d/%d)' % (
                     test_loss / (batch_idx + 1), 100. * correct / total, correct, total))
-
+        writer.flush()
     # Save checkpoint.
     acc = 100. * correct / total
     if acc > best_acc:
