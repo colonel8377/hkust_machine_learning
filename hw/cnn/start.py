@@ -16,7 +16,7 @@ from torchvision import transforms
 from models import DPN92
 from train import train, test, init_best_acc
 
-run = Run.get_context()
+run_context = Run.get_context()
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch CIFAR Example')
@@ -249,7 +249,9 @@ def prepare_optimizer(_net):
 def run(_net, train_loader, test_loader, _device, _criterion, _optimizer,
         _scheduler, _best_acc, _start_epoch):
     for k in args.__dict__:
-        print(str(k) + '------' + str(args.__dict__[k]))
+        run_config = str(k) + '--' + str(args.__dict__[k])
+        print(run_config)
+    run_context.log_table('Runing Configuration', args.__dict__)
     init_best_acc(_best_acc)
     if not args.test:
         for epoch in range(_start_epoch, args.end_epochs):

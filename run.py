@@ -51,13 +51,13 @@ def commit_job(_operate_env):
     src = ScriptRunConfig(source_directory='./hw/cnn',
                           script='start.py',
                           arguments=[
-                              '--end_epochs', 200, '--data_dir',
+                              '--end_epochs', 250, '--data_dir',
                               dataset.as_named_input('input').as_mount()
                           ],
                           compute_target=cluster_name,
                           environment=_operate_env)
     run = experiment.submit(config=src)
-    tb = Tensorboard(runs=[run], local_root='./hw/cnn/run')
+    tb = Tensorboard(runs=[run])
     tb.start(start_browser=True)
     ml_flow()
     run.wait_for_completion(show_output=True)
