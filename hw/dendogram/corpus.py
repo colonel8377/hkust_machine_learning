@@ -12,13 +12,20 @@ class Text(object):
         # remove all punctuation, transform to lowercase and split on spaces
         self._tokens = text.translate(None, string.punctuation).lower().split()
 
-    def __hash__(self): # IS THIS ALLOWED?
+    def __hash__(self):  # IS THIS ALLOWED?
         return self._id
 
-    def title(self): return self._title
-    def author(self): return self._author
-    def year(self): return self._year
-    def kind(self): return self._kind
+    def title(self):
+        return self._title
+
+    def author(self):
+        return self._author
+
+    def year(self):
+        return self._year
+
+    def kind(self):
+        return self._kind
 
     def __getitem__(self, i):
         if isinstance(i, slice):
@@ -28,4 +35,3 @@ class Text(object):
 
     def __len__(self):
         return len(self._tokens)
-

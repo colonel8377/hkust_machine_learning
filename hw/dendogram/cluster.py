@@ -21,7 +21,6 @@ from sklearn.metrics.pairwise import pairwise_distances
 
 class CooccurrenceMatrix(numpy.ndarray):
     """ Represents a co-occurrence matrix. """
-
     def __new__(cls, data, dtype=None):
         if not isinstance(data, CooccurrenceMatrix):
             data, rownames, colnames = CooccurrenceMatrix.convert(data)
@@ -48,8 +47,8 @@ class CooccurrenceMatrix(numpy.ndarray):
 
     @classmethod
     def convert(cls, data):
-        matrix = numpy.zeros((len(set(k for k, v in data)),
-                              len(set(v for k, v in data))))
+        matrix = numpy.zeros(
+            (len(set(k for k, v in data)), len(set(v for k, v in data))))
         colnames, rownames = {}, {}
         for k, v in sorted(data):
             if k not in rownames:
@@ -70,7 +69,8 @@ class CooccurrenceMatrix(numpy.ndarray):
         # the number of words in a document
         words_per_doc = numpy.asarray(self.sum(axis=1), dtype=float)
         # the number of documents in which a word is attested.
-        word_frequencies = numpy.asarray(numpy.sum(self > 0, axis=0), dtype=float)
+        word_frequencies = numpy.asarray(numpy.sum(self > 0, axis=0),
+                                         dtype=float)
         # calculate the term frequencies
         for i in range(self.shape[0]):
             tf = self[i] / words_per_doc[i]  # array of tf's
@@ -84,12 +84,13 @@ class DistanceMatrix(numpy.ndarray):
     Distance Matrix functionality like plotting the distance matrix
     with matplotlib.
     """
-
     def __new__(cls, data, dist_metric=euclidean_distance, lower=True):
         if (not isinstance(data, (numpy.ndarray, DistanceMatrix))
                 or len(data) != len(data[0])
                 or not max(numpy.diag(data)) == 0):
-            data = DistanceMatrix.convert_to_distmatrix(data, dist_metric, lower=lower)
+            data = DistanceMatrix.convert_to_distmatrix(data,
+                                                        dist_metric,
+                                                        lower=lower)
         obj = numpy.asarray(data).view(cls)
         obj.distance_metric = dist_metric
         return obj
@@ -142,13 +143,15 @@ class DistanceMatrix(numpy.ndarray):
             raise ImportError("Install pylab.")
         fig = pylab.figure()
         axmatrix = fig.add_axes([0.1, 0.1, 0.8, 0.8])
-        im = axmatrix.matshow(self, aspect='auto', origin='upper',
+        im = axmatrix.matshow(self,
+                              aspect='auto',
+                              origin='upper',
                               cmap=pylab.cm.YlGnBu)
         axcolor = fig.add_axes([0.91, 0.1, 0.02, 0.8])
         pylab.colorbar(im, cax=axcolor)
         fig.show()
         if save:
-            fig.savefig('distance-matrix.%s' % (format,))
+            fig.savefig('distance-matrix.%s' % (format, ))
 
     def summary(self):
         """Return a small summary of the matrix."""
@@ -164,7 +167,6 @@ class Clusterer(AbstractClusterer):
     have the smallest distance according to function LINKAGE. This continues
     until there is only one cluster.
     """
-
     def __init__(self, data, linkage='ward', num_clusters=1):
         self._num_clusters = num_clusters
         vector_ids = [[i] for i in range(len(data))]
@@ -234,7 +236,8 @@ class Clusterer(AbstractClusterer):
 
     def __repr__(self):
         return """<Hierarchical Agglomerative Clusterer(linkage method: %r,
-                  n=%d clusters>""" % (self.linkage.__name__, self._num_clusters)
+                  n=%d clusters>""" % (self.linkage.__name__,
+                                       self._num_clusters)
 
 
 class VNClusterer(Clusterer):
@@ -244,7 +247,6 @@ class VNClusterer(Clusterer):
     procedure, all clusters can be clustered with all other clusters. In this
     class, the clusters that are allowed to be clustered follow a specific order.
     """
-
     def __init__(self, data, linkage='ward', num_clusters=1):
         Clusterer.__init__(self, data, linkage, num_clusters=num_clusters)
 
@@ -267,14 +269,14 @@ class VNClusterer(Clusterer):
 
 
 class EuclideanNeighborClusterer(VNClusterer):
-
     def iterate_clusters(self, x, y):
         n_features, n_samples = x, y
         offset = (0, -1, 1)
         indices = ((i, j) for i in range(n_features) for j in range(n_samples))
         for i, j in indices:
             all_neigh = ((i + x, j + y) for x in offset for y in offset)
-            valid = ((i * n_features + j) for i, j in all_neigh if (0 <= i < n_features) and (0 <= j < n_samples))
+            valid = ((i * n_features + j) for i, j in all_neigh
+                     if (0 <= i < n_features) and (0 <= j < n_samples))
             target = valid.next()
             for neighbor in list(valid):
                 yield target, neighbor
@@ -297,10 +299,8 @@ def demo():
     #                          [13.0, 4.0, 15.0, 5.0, 20.0, 0.0, 19.0, 22.0],
     #                          [9.0, 15.0, 12.0, 16.0, 15.0, 19.0, 0.0, 30.0],
     #                          [11.0, 20.0, 12.0, 21.0, 17.0, 22.0, 30.0, 0.0]])
-    dist_matrix = np.array([[0.0, 1.0, 4.0, 5.10],
-                            [1.0, 0.0, 3.0, 4.12],
-                            [4.0, 3.0, 0.0, 1.41],
-                            [5.10, 4.12, 1.41, 0.0]])
+    dist_matrix = np.array([[0.0, 1.0, 4.0, 5.10], [1.0, 0.0, 3.0, 4.12],
+                            [4.0, 3.0, 0.0, 1.41], [5.10, 4.12, 1.41, 0.0]])
     print(dist_matrix)
     # plot the distance matrix:
     # dist_matrix.draw() this doesn't work anymore
@@ -314,7 +314,9 @@ def demo():
 
     labels = ['n' + str(i + 1) for i in range(dist_matrix.shape[0])]
     # plot the result as a dendrogram
-    clusterer.dendrogram.draw(save=True, labels=labels, title="VNC Analysis (Group Average's Linkage)")
+    clusterer.dendrogram.draw(save=True,
+                              labels=labels,
+                              title="VNC Analysis (Group Average's Linkage)")
 
 
 if __name__ == '__main__':

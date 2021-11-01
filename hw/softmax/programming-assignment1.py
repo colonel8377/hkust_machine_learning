@@ -20,12 +20,17 @@ import math
 IRIS_TRAINING = "iris_data/iris_training.csv"
 IRIS_TEST = "iris_data/iris_test.csv"
 
+
 def get_data():
     # Load datasets.
-    train_data = np.genfromtxt(IRIS_TRAINING, skip_header=1,
-                               dtype=float, delimiter=',')
-    test_data = np.genfromtxt(IRIS_TEST, skip_header=1,
-                              dtype=float, delimiter=',')
+    train_data = np.genfromtxt(IRIS_TRAINING,
+                               skip_header=1,
+                               dtype=float,
+                               delimiter=',')
+    test_data = np.genfromtxt(IRIS_TEST,
+                              skip_header=1,
+                              dtype=float,
+                              delimiter=',')
     train_x = train_data[:, :4]
     train_y = train_data[:, 4].astype(np.int64)
     test_x = test_data[:, :4]
@@ -112,9 +117,17 @@ def acc(ylabel, y_pred):
     return np.mean(ylabel == y_pred)
 
 
-def train(X, y, Xtest, ytest, learning_rate=1e-3, reg=1e-5, epochs=100, batch_size=20):
+def train(X,
+          y,
+          Xtest,
+          ytest,
+          learning_rate=1e-3,
+          reg=1e-5,
+          epochs=100,
+          batch_size=20):
     num_train, dim = X.shape
-    num_classes = np.max(y) + 1  # assume y takes values 0...K-1 where K is number of classes
+    num_classes = np.max(
+        y) + 1  # assume y takes values 0...K-1 where K is number of classes
     num_iters_per_epoch = int(math.floor(1.0 * num_train / batch_size))
 
     # randomly initialize W
@@ -151,14 +164,14 @@ reg = 0.01
 
 # get training and testing data
 train_x, train_y, test_x, test_y = get_data()
-W = train(train_x, train_y, test_x, test_y, learning_rate, reg, max_epochs, batch_size)
+W = train(train_x, train_y, test_x, test_y, learning_rate, reg, max_epochs,
+          batch_size)
 
 
 # Classify two new flower samples.
 def new_samples():
-    return np.array(
-      [[6.4, 3.2, 4.5, 1.5],
-       [5.8, 3.1, 5.0, 1.7]], dtype=np.float32)
+    return np.array([[6.4, 3.2, 4.5, 1.5], [5.8, 3.1, 5.0, 1.7]],
+                    dtype=np.float32)
 
 
 new_x = new_samples()

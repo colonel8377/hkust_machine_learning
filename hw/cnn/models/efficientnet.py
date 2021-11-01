@@ -24,13 +24,16 @@ def drop_connect(x, drop_ratio):
 
 class SE(nn.Module):
     '''Squeeze-and-Excitation block with Swish.'''
-
     def __init__(self, in_channels, se_channels):
         super(SE, self).__init__()
-        self.se1 = nn.Conv2d(in_channels, se_channels,
-                             kernel_size=1, bias=True)
-        self.se2 = nn.Conv2d(se_channels, in_channels,
-                             kernel_size=1, bias=True)
+        self.se1 = nn.Conv2d(in_channels,
+                             se_channels,
+                             kernel_size=1,
+                             bias=True)
+        self.se2 = nn.Conv2d(se_channels,
+                             in_channels,
+                             kernel_size=1,
+                             bias=True)
 
     def forward(self, x):
         out = F.adaptive_avg_pool2d(x, (1, 1))
@@ -42,7 +45,6 @@ class SE(nn.Module):
 
 class Block(nn.Module):
     '''expansion + depthwise + pointwise + squeeze-excitation'''
-
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -120,11 +122,16 @@ class EfficientNet(nn.Module):
 
     def _make_layers(self, in_channels):
         layers = []
-        cfg = [self.cfg[k] for k in ['expansion', 'out_channels', 'num_blocks', 'kernel_size',
-                                     'stride']]
+        cfg = [
+            self.cfg[k] for k in [
+                'expansion', 'out_channels', 'num_blocks', 'kernel_size',
+                'stride'
+            ]
+        ]
         b = 0
         blocks = sum(self.cfg['num_blocks'])
-        for expansion, out_channels, num_blocks, kernel_size, stride in zip(*cfg):
+        for expansion, out_channels, num_blocks, kernel_size, stride in zip(
+                *cfg):
             strides = [stride] + [1] * (num_blocks - 1)
             for stride in strides:
                 drop_rate = self.cfg['drop_connect_rate'] * b / blocks

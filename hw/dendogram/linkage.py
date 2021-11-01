@@ -45,11 +45,11 @@ def _general_link(clusters, i, j, method):
     for k in range(len(clusters)):
         if k != i and k != j:
             if method.__name__ == "ward_update":
-                new_distance = method(clusters[i,k], clusters[j,k], k)
+                new_distance = method(clusters[i, k], clusters[j, k], k)
             else:
-                new_distance = method(clusters[i,k], clusters[j,k])
-            clusters[i,k] = new_distance
-            clusters[k,i] = new_distance
+                new_distance = method(clusters[i, k], clusters[j, k])
+            clusters[i, k] = new_distance
+            clusters[k, i] = new_distance
     return clusters
 
 
@@ -65,10 +65,10 @@ def single_link(clusters, i, j, dendrogram):
     M{min(d(i,k),d(j,k))}
     """
     ks = np.arange(clusters.shape[0])
-    ks = ks[(ks!=i) & (ks!=j)]
-    minima = np.minimum(clusters[i,], clusters[j,])[ks]
-    clusters[i,ks] = minima
-    clusters[ks,i] = minima
+    ks = ks[(ks != i) & (ks != j)]
+    minima = np.minimum(clusters[i, ], clusters[j, ])[ks]
+    clusters[i, ks] = minima
+    clusters[ks, i] = minima
     return clusters
     # return _general_link(clusters, i, j, min)
 
@@ -85,10 +85,10 @@ def complete_link(clusters, i, j, dendrogram):
     M{max(d(i,k),d(j,k))}
     """
     ks = np.arange(clusters.shape[0])
-    ks = ks[(ks!=i) & (ks!=j)]
-    maxima = np.maximum(clusters[i,], clusters[j,])[ks]
-    clusters[i,ks] = maxima
-    clusters[ks,i] = maxima
+    ks = ks[(ks != i) & (ks != j)]
+    maxima = np.maximum(clusters[i, ], clusters[j, ])[ks]
+    clusters[i, ks] = maxima
+    clusters[ks, i] = maxima
     return clusters
     # return _general_link(clusters, i, j, max)
 
@@ -106,7 +106,7 @@ def average_link(clusters, i, j, dendrogram):
     n_i, n_j = len(dendrogram[i]), len(dendrogram[j])
     a_i = n_i / (n_i + n_j)
     a_j = n_j / (n_i + n_j)
-    update_fn = lambda d_ik, d_jk: a_i*d_ik + a_j*d_jk
+    update_fn = lambda d_ik, d_jk: a_i * d_ik + a_j * d_jk
     return _general_link(clusters, i, j, update_fn)
 
 
@@ -120,7 +120,8 @@ def median_link(clusters, i, j, dendrogram):
     
     M{S{alpha}(i) = 0.5; S{beta} = -0.25; S{gamma} = 0}
     """
-    update_fn = lambda d_ik,d_jk: 0.5*d_ik + 0.5*d_jk + -0.25*clusters[i,j]
+    update_fn = lambda d_ik, d_jk: 0.5 * d_ik + 0.5 * d_jk + -0.25 * clusters[
+        i, j]
     return _general_link(clusters, i, j, update_fn)
 
 
@@ -139,7 +140,7 @@ def centroid_link(clusters, i, j, dendrogram):
     a_i = n_i / (n_i + n_j)
     a_j = n_j / (n_i + n_j)
     b = -(n_i * n_j) / (n_i + n_j)**2
-    update_fn = lambda d_ik,d_jk: a_i*d_ik + a_j*d_jk + b*clusters[i,j]
+    update_fn = lambda d_ik, d_jk: a_i * d_ik + a_j * d_jk + b * clusters[i, j]
     return _general_link(clusters, i, j, update_fn)
 
 
@@ -155,20 +156,24 @@ def ward_link(clusters, i, j, dendrogram):
     S{beta} = -|k|/(|i| + |j| + |k|); S{gamma} = 0}
     """
     n_i, n_j = len(dendrogram[i]), len(dendrogram[j])
+
     def ward_update(d_ik, d_jk, k):
         n_k = len(dendrogram[k])
-        n_ijk = n_i+n_j+n_k
-        return ( (n_i+n_k)/(n_ijk)*d_ik + (n_j+n_k)/(n_ijk)*d_jk +
-                 -(n_k/(n_ijk))*clusters[i][j] )
+        n_ijk = n_i + n_j + n_k
+        return ((n_i + n_k) / (n_ijk) * d_ik + (n_j + n_k) / (n_ijk) * d_jk +
+                -(n_k / (n_ijk)) * clusters[i][j])
+
     return _general_link(clusters, i, j, ward_update)
 
 
-LINKAGES = {'ward': ward_link, 
-            'complete': complete_link,
-            'single': single_link,
-            'centroid': centroid_link,
-            'average': average_link,
-            'median': median_link}
+LINKAGES = {
+    'ward': ward_link,
+    'complete': complete_link,
+    'single': single_link,
+    'centroid': centroid_link,
+    'average': average_link,
+    'median': median_link
+}
 
 
 def linkage_fn(linkage):
@@ -177,5 +182,7 @@ def linkage_fn(linkage):
     raise ValueError("Linkage funtion '%s' is not supported" % linkage)
 
 
-__all__ = ['single_link', 'complete_link', 'centroid_link', 'ward_link',
-           'median_link', 'average_link']
+__all__ = [
+    'single_link', 'complete_link', 'centroid_link', 'ward_link',
+    'median_link', 'average_link'
+]

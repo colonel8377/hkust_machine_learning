@@ -11,7 +11,6 @@ import torch.nn.functional as F
 
 class SE(nn.Module):
     '''Squeeze-and-Excitation block.'''
-
     def __init__(self, in_planes, se_planes):
         super(SE, self).__init__()
         self.se1 = nn.Conv2d(in_planes, se_planes, kernel_size=1, bias=True)
@@ -26,7 +25,8 @@ class SE(nn.Module):
 
 
 class Block(nn.Module):
-    def __init__(self, w_in, w_out, stride, group_width, bottleneck_ratio, se_ratio):
+    def __init__(self, w_in, w_out, stride, group_width, bottleneck_ratio,
+                 se_ratio):
         super(Block, self).__init__()
         # 1x1
         w_b = int(round(w_out * bottleneck_ratio))
@@ -34,8 +34,13 @@ class Block(nn.Module):
         self.bn1 = nn.BatchNorm2d(w_b)
         # 3x3
         num_groups = w_b // group_width
-        self.conv2 = nn.Conv2d(w_b, w_b, kernel_size=3,
-                               stride=stride, padding=1, groups=num_groups, bias=False)
+        self.conv2 = nn.Conv2d(w_b,
+                               w_b,
+                               kernel_size=3,
+                               stride=stride,
+                               padding=1,
+                               groups=num_groups,
+                               bias=False)
         self.bn2 = nn.BatchNorm2d(w_b)
         # se
         self.with_se = se_ratio > 0
@@ -49,10 +54,11 @@ class Block(nn.Module):
         self.shortcut = nn.Sequential()
         if stride != 1 or w_in != w_out:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(w_in, w_out,
-                          kernel_size=1, stride=stride, bias=False),
-                nn.BatchNorm2d(w_out)
-            )
+                nn.Conv2d(w_in,
+                          w_out,
+                          kernel_size=1,
+                          stride=stride,
+                          bias=False), nn.BatchNorm2d(w_out))
 
     def forward(self, x):
         out = F.relu(self.bn1(self.conv1(x)))
@@ -70,8 +76,12 @@ class RegNet(nn.Module):
         super(RegNet, self).__init__()
         self.cfg = cfg
         self.in_planes = 64
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=3,
-                               stride=1, padding=1, bias=False)
+        self.conv1 = nn.Conv2d(3,
+                               64,
+                               kernel_size=3,
+                               stride=1,
+                               padding=1,
+                               bias=False)
         self.bn1 = nn.BatchNorm2d(64)
         self.layer1 = self._make_layer(0)
         self.layer2 = self._make_layer(1)
@@ -90,8 +100,9 @@ class RegNet(nn.Module):
         layers = []
         for i in range(depth):
             s = stride if i == 0 else 1
-            layers.append(Block(self.in_planes, width,
-                                s, group_width, bottleneck_ratio, se_ratio))
+            layers.append(
+                Block(self.in_planes, width, s, group_width, bottleneck_ratio,
+                      se_ratio))
             self.in_planes = width
         return nn.Sequential(*layers)
 

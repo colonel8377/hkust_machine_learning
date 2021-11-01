@@ -7,7 +7,10 @@ from azureml.exceptions import ComputeTargetException
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR Example')
 
-parser.add_argument('--exp_name', type=str, default='test', metavar='EXPNAME',
+parser.add_argument('--exp_name',
+                    type=str,
+                    default='test',
+                    metavar='EXPNAME',
                     help='experiment name')
 args = parser.parse_args()
 
@@ -27,10 +30,11 @@ def prepare_environment():
         print('Found existing compute target.')
     except ComputeTargetException:
         print('Creating a new compute target...')
-        compute_config = AmlCompute.provisioning_configuration(vm_size='STANDARD_NC6',
-                                                               max_nodes=4,
-                                                               remote_login_port_public_access='Enabled',
-                                                               enable_node_public_ip=True)
+        compute_config = AmlCompute.provisioning_configuration(
+            vm_size='STANDARD_NC6',
+            max_nodes=4,
+            remote_login_port_public_access='Enabled',
+            enable_node_public_ip=True)
         # create the cluster
         compute_target = ComputeTarget.create(ws, cluster_name, compute_config)
         compute_target.wait_for_completion(show_output=True)
@@ -46,15 +50,29 @@ def commit_job(_operate_env):
     dataset = Dataset.File.from_files(path=(datastore, data_target_path))
     src = ScriptRunConfig(source_directory='./hw/cnn',
                           script='start.py',
-                          arguments=['--end_epochs', 200, '--data_dir', dataset.as_named_input('input').as_mount()],
+                          arguments=[
+                              '--end_epochs', 200, '--data_dir',
+                              dataset.as_named_input('input').as_mount()
+                          ],
                           compute_target=cluster_name,
                           environment=_operate_env)
     run = experiment.submit(config=src)
-    tb = Tensorboard([run])
-    tb.start()
+    tb = Tensorboard(runs=[run], local_root='./hw/cnn/run')
+    tb.start(start_browser=True)
+    ml_flow()
     run.wait_for_completion(show_output=True)
+    run.download_file(name='checkpoints/ckpt.pth',
+                      output_file_path='hw/cnn/outputs/DPN92net.pt')
     tb.stop()
-    run.download_file(name='outputs/ckpt.pth', output_file_path='./model/model.pt')
+
+
+def ml_flow():
+    import mlflow
+    mlflow.set_tracking_uri(ws.get_mlflow_tracking_uri())
+    mlflow.create_experiment("mlflow-experiment")
+    mlflow.set_experiment("mlflow-experiment")
+    mlflow_run = mlflow.start_run()
+    return mlflow_run
 
 
 if __name__ == '__main__':

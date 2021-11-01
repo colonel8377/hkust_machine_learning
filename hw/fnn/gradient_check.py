@@ -77,17 +77,18 @@ def eval_numerical_gradient_blobs(f, inputs, output, h=1e-5):
     numeric_diffs = []
     for input_blob in inputs:
         diff = np.zeros_like(input_blob.diffs)
-        it = np.nditer(input_blob.vals, flags=['multi_index'],
+        it = np.nditer(input_blob.vals,
+                       flags=['multi_index'],
                        op_flags=['readwrite'])
         while not it.finished:
             idx = it.multi_index
             orig = input_blob.vals[idx]
 
             input_blob.vals[idx] = orig + h
-            f(*(inputs + (output,)))
+            f(*(inputs + (output, )))
             pos = np.copy(output.vals)
             input_blob.vals[idx] = orig - h
-            f(*(inputs + (output,)))
+            f(*(inputs + (output, )))
             neg = np.copy(output.vals)
             input_blob.vals[idx] = orig
 
@@ -100,7 +101,9 @@ def eval_numerical_gradient_blobs(f, inputs, output, h=1e-5):
 
 def eval_numerical_gradient_net(net, inputs, output, h=1e-5):
     return eval_numerical_gradient_blobs(lambda *args: net.forward(),
-                                         inputs, output, h=h)
+                                         inputs,
+                                         output,
+                                         h=h)
 
 
 def grad_check_sparse(f, x, analytic_grad, num_checks=10, h=1e-5):
@@ -121,10 +124,12 @@ def grad_check_sparse(f, x, analytic_grad, num_checks=10, h=1e-5):
 
         grad_numerical = (fxph - fxmh) / (2 * h)
         grad_analytic = analytic_grad[ix]
-        rel_error = abs(grad_numerical - grad_analytic) / (abs(grad_numerical) + abs(grad_analytic))
-        print('numerical: %f analytic: %f, relative error: %e' % (grad_numerical, grad_analytic, rel_error))
+        rel_error = abs(grad_numerical - grad_analytic) / (
+            abs(grad_numerical) + abs(grad_analytic))
+        print('numerical: %f analytic: %f, relative error: %e' %
+              (grad_numerical, grad_analytic, rel_error))
 
 
 def rel_error(x, y):
-  """ returns relative error """
-  return np.mean(np.abs(x - y) / (np.maximum(1e-8, np.abs(x) + np.abs(y))))
+    """ returns relative error """
+    return np.mean(np.abs(x - y) / (np.maximum(1e-8, np.abs(x) + np.abs(y))))
