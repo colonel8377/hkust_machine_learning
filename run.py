@@ -1,9 +1,9 @@
 import argparse
 
 from azureml.core import Workspace, Environment, ScriptRunConfig, ComputeTarget, Dataset, Experiment
-from azureml.tensorboard import Tensorboard
 from azureml.core.compute import AmlCompute
 from azureml.exceptions import ComputeTargetException
+from azureml.tensorboard import Tensorboard
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR Example')
 
@@ -41,8 +41,7 @@ def prepare_environment():
 
     # use get_status() to get a detailed status for the current AmlCompute.
     print(compute_target.get_status().serialize())
-    pytorch_env = Environment.get(workspace=ws, name='AzureML-pytorch-1.9-ubuntu18.04-py37-cuda11-gpu')\
-        .from_pip_requirements(name='pytorch-gpu', file_path='azure-requirements.txt')
+    pytorch_env = Environment.get(workspace=ws, name='Azure-ml-py38-pyorch1.10-cuda11.3-ust')
     return pytorch_env
 
 
@@ -57,7 +56,7 @@ def commit_job(_operate_env):
                           compute_target=cluster_name,
                           environment=_operate_env)
     run = experiment.submit(config=src)
-    tb = Tensorboard(runs=[run])
+    tb = Tensorboard(runs=[run], port=6000, local_root='./run')
     tb.start(start_browser=True)
     ml_flow()
     run.wait_for_completion(show_output=True)
