@@ -93,7 +93,7 @@ def test(model, epoch, testloader, device, criterion):
                                  100. * correct / total, correct, total))
                 run.log('Accuracy', auc, 'Model Accuracy')
                 run.log('Loss', avg_loss, 'Model Loss')
-    writer.flush()
+        writer.flush()
     # Save checkpoint.
     acc = 100. * correct / total
     if acc > best_acc:
