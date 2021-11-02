@@ -1,6 +1,6 @@
 import argparse
 
-from azureml.core import Workspace, Environment, ScriptRunConfig, ComputeTarget, Dataset, Experiment, RunConfiguration
+from azureml.core import Workspace, Environment, ScriptRunConfig, ComputeTarget, Dataset, Experiment
 from azureml.core.compute import AmlCompute
 from azureml.exceptions import ComputeTargetException
 from azureml.tensorboard import Tensorboard
@@ -41,12 +41,12 @@ def prepare_environment():
 
     # use get_status() to get a detailed status for the current AmlCompute.
     print(compute_target.get_status().serialize())
-    pytorch_env = Environment.get(workspace=ws, name='Azure-ml-py38-pyorch1.10-cuda11.3-ust')
-    pytorch_env.environment_variables.update("AZUREML_COMPUTE_USE_COMMON_RUNTIME", "false")
+    pytorch_env = Environment(name='pytorch', AZUREML_COMPUTE_USE_COMMON_RUNTIME='false')
+    pytorch_env = pytorch_env.get(workspace=ws, name='Azure-ml-py38-pyorch1.10-cuda11.3-ust', version='2')
     return pytorch_env
 
 
-def commit_job(_operate_env):
+def commit_job(_operate_env, _experiment):
     dataset = Dataset.File.from_files(path=(datastore, data_target_path))
     src = ScriptRunConfig(source_directory='./hw/cnn',
                           script='start.py',
@@ -55,9 +55,10 @@ def commit_job(_operate_env):
                               dataset.as_named_input('input').as_mount()
                           ],
                           compute_target=cluster_name,
-                          environment=_operate_env)
-    run = experiment.submit(config=src)
-    tb = Tensorboard(runs=[run], port=6000, local_root='./run')
+                          environment=_operate_env
+                          )
+    run = _experiment.submit(config=src)
+    tb = Tensorboard(runs=[run], port=6000, local_root='./hw/cnn/run')
     tb.start(start_browser=True)
     ml_flow()
     run.wait_for_completion(show_output=True)
@@ -77,6 +78,6 @@ def ml_flow():
 
 if __name__ == '__main__':
     experiment_name = args.exp_name
-    experiment = Experiment(workspace=ws, name=experiment_name)
+    _experiment = Experiment(workspace=ws, name=experiment_name)
     operate_env = prepare_environment()
-    commit_job(operate_env)
+    commit_job(operate_env, _experiment)

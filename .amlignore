@@ -1,6 +1,0 @@
-*.log
-*.lock
-*.pt
-*.pth
-/**/predict
-/**/_pycache_
