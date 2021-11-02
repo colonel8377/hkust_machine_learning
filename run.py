@@ -1,6 +1,6 @@
 import argparse
 
-from azureml.core import Workspace, Environment, ScriptRunConfig, ComputeTarget, Dataset, Experiment
+from azureml.core import Workspace, Environment, ScriptRunConfig, ComputeTarget, Dataset, Experiment, RunConfiguration
 from azureml.core.compute import AmlCompute
 from azureml.exceptions import ComputeTargetException
 from azureml.tensorboard import Tensorboard
@@ -42,6 +42,7 @@ def prepare_environment():
     # use get_status() to get a detailed status for the current AmlCompute.
     print(compute_target.get_status().serialize())
     pytorch_env = Environment.get(workspace=ws, name='Azure-ml-py38-pyorch1.10-cuda11.3-ust')
+    pytorch_env.environment_variables.update("AZUREML_COMPUTE_USE_COMMON_RUNTIME", "false")
     return pytorch_env
 
 
