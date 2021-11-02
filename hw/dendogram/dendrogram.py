@@ -5,6 +5,7 @@ import numpy
 
 from operator import itemgetter
 
+
 class DendrogramNode(object):
     """Represents a node in a dendrogram."""
     def __init__(self, id, *children):
@@ -34,7 +35,8 @@ class DendrogramNode(object):
             for child in self._children:
                 a_list.extend(child.adjacency_list())
             return a_list
-        else: return []
+        else:
+            return []
 
     def __len__(self):
         return len(self.leaves())
@@ -47,7 +49,8 @@ class Dendrogram(list):
     matplotlib and VNC.
     """
     def __init__(self, items):
-        super(Dendrogram, self).__init__(map(DendrogramNode, range(len(items))))
+        super(Dendrogram, self).__init__(map(DendrogramNode,
+                                             range(len(items))))
         self._num_items = len(self)
 
     def merge(self, *indices):
@@ -56,8 +59,7 @@ class Dendrogram(list):
         The new node will get the index of the first node specified.
         """
         assert len(indices) >= 2
-        node = DendrogramNode(
-            self._num_items, *[self[i] for i in indices])
+        node = DendrogramNode(self._num_items, *[self[i] for i in indices])
         self._num_items += 1
         self[indices[0]] = node
         for i in indices[1:]:
@@ -67,9 +69,15 @@ class Dendrogram(list):
         Z = self[0].adjacency_list()
         Z.sort()
         Z = numpy.array(Z)
-        return Z[:,1:]
+        return Z[:, 1:]
 
-    def draw(self, show=True, save=False, format="pdf", labels=None, title=None, fontsize=None):
+    def draw(self,
+             show=True,
+             save=False,
+             format="pdf",
+             labels=None,
+             title=None,
+             fontsize=None):
         """Draw the dendrogram using pylab and matplotlib."""
         try:
             from scipy.cluster.hierarchy import dendrogram as scipy_dendrogram
@@ -82,7 +90,8 @@ class Dendrogram(list):
         try:
             import matplotlib.pyplot as plt
         except ImportError:
-            raise ImportError("Matplotlib not installed, can't draw dendrogram")
+            raise ImportError(
+                "Matplotlib not installed, can't draw dendrogram")
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
@@ -93,13 +102,14 @@ class Dendrogram(list):
 
         m = self.to_linkage_matrix()
 
-        d = scipy_dendrogram(m, labels=labels,
+        d = scipy_dendrogram(m,
+                             labels=labels,
                              leaf_font_size=fontsize,
-                             color_threshold=0.7*max(m[:,2]),
+                             color_threshold=0.7 * max(m[:, 2]),
                              leaf_rotation=180)
 
         ax = plt.gca()
-        ax_labels = ax.get_xmajorticklabels()+ax.get_ymajorticklabels()
+        ax_labels = ax.get_xmajorticklabels() + ax.get_ymajorticklabels()
         for i in range(len(ax_labels)):
             ax_labels[i].set_family('arial')
 
@@ -125,7 +135,7 @@ class Dendrogram(list):
         if show:
             fig.show()
         if save:
-            fig.savefig('dendrogram.%s' % (format,))
+            fig.savefig('dendrogram.%s' % (format, ))
 
     def ete_tree(self, labels=None):
         if sys.version_info[0] == 2:
@@ -173,5 +183,5 @@ class Dendrogram(list):
         # Applies the same static style to all nodes in the tree. Note that,
         # if "nstyle" is modified, changes will affect to all nodes
         for n in root.traverse():
-           n.set_style(nstyle)
+            n.set_style(nstyle)
         return root

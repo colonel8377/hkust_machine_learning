@@ -13,16 +13,15 @@ dataset = [
 ]
 
 if __name__ == '__main__':
-    frequent_itemsets = fpg.find_frequent_itemsets(dataset, minimum_support=3, include_support=True)
-    print(type(frequent_itemsets))   # print type
+    frequent_itemsets = fpg.find_frequent_itemsets(dataset,
+                                                   minimum_support=3,
+                                                   include_support=True)
+    print(type(frequent_itemsets))  # print type
 
     result = []
-    for itemset, support in frequent_itemsets:    # 将generator结果存入list
+    for itemset, support in frequent_itemsets:  # 将generator结果存入list
         result.append((itemset, support))
 
-    result = sorted(result, key=lambda i: i[0])   # 排序后输出
+    result = sorted(result, key=lambda i: i[0])  # 排序后输出
     for itemset, support in result:
         print(str(itemset) + ' ' + str(support))
-
-
-

@@ -3,7 +3,9 @@
 from collections import defaultdict, namedtuple
 
 
-def find_frequent_itemsets(transactions, minimum_support, include_support=False):
+def find_frequent_itemsets(transactions,
+                           minimum_support,
+                           include_support=False):
     items = defaultdict(lambda: 0)  # mapping from items to their supports
 
     # Load the passed-in transactions and count the support that individual
@@ -18,7 +20,8 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False)
 
     def clean_transaction(transaction):
         transaction = filter(lambda v: v in items, transaction)
-        transaction_list = list(transaction)  # 为了防止变量在其他部分调用，这里引入临时变量transaction_list
+        transaction_list = list(
+            transaction)  # 为了防止变量在其他部分调用，这里引入临时变量transaction_list
         transaction_list.sort(key=lambda v: items[v], reverse=True)
         return transaction_list
 
@@ -36,7 +39,8 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False)
 
                 # Build a conditional tree and recursively search for frequent
                 # itemsets within it.
-                cond_tree = conditional_tree_from_paths(tree.prefix_paths(item))
+                cond_tree = conditional_tree_from_paths(
+                    tree.prefix_paths(item))
                 for s in find_with_suffix(cond_tree, found_set):
                     yield s  # pass along the good news to our caller
 
@@ -163,7 +167,6 @@ class FPTree(object):
 
     def prefix_paths(self, item):
         """Generate the prefix paths that end with the given item."""
-
         def collect_path(node):
             path = []
             while node and not node.root:
@@ -188,7 +191,6 @@ class FPTree(object):
 
 class FPNode(object):
     """A node in an FP tree."""
-
     def __init__(self, tree, item, count=1):
         self._tree = tree
         self._item = item

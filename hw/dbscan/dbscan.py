@@ -67,7 +67,8 @@ class DBSCAN():
         xmax, xmin, ymax, ymin = (0, 0, 0, 0)
 
         for num, cluster in enumerate(self.clusters):
-            print('Drawing cluster', num, 'with', len(cluster.points), 'points')
+            print('Drawing cluster', num, 'with', len(cluster.points),
+                  'points')
             for point in cluster.points:
                 xmax, xmin = (max(xmax, point.x), min(xmin, point.x))
                 ymax, ymin = (max(ymax, point.y), min(ymin, point.y))

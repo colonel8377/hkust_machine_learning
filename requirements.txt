@@ -4,6 +4,11 @@ yapf==0.28.0
 
 mypy
 
-numpy~=1.19.2
-scikit-learn~=0.23.1
-matplotlib~=3.3.4
+numpy
+scikit-learn
+matplotlib
+torch
+torchvision
+opencv-python
+tensorflow~=2.3.0
+azureml

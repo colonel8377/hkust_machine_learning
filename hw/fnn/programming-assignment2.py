@@ -17,7 +17,6 @@ for the propagations are deleted.  Your task is to fill in the missing codes.
 # first layer is a relu layer with 10 units, and second one is a softmax layer.
 # randomly initialize parameters
 
-
 import numpy as np
 import os, sys
 import math
@@ -29,10 +28,14 @@ IRIS_TEST = "iris_test.csv"
 
 def get_data():
     # Load datasets.
-    train_data = np.genfromtxt(IRIS_TRAINING, skip_header=1,
-                               dtype=float, delimiter=',')
-    test_data = np.genfromtxt(IRIS_TEST, skip_header=1,
-                              dtype=float, delimiter=',')
+    train_data = np.genfromtxt(IRIS_TRAINING,
+                               skip_header=1,
+                               dtype=float,
+                               delimiter=',')
+    test_data = np.genfromtxt(IRIS_TEST,
+                              skip_header=1,
+                              dtype=float,
+                              delimiter=',')
     train_x = train_data[:, :4]
     train_y = train_data[:, 4].astype(np.int64)
     test_x = test_data[:, :4]
@@ -79,7 +82,7 @@ def compute_neural_net_loss(params, X, y, reg=0.0):
     # compute softmax loss
     loss -= np.sum(np.log(out[np.arange(N), y]))
     loss /= N
-    loss += 0.5 * reg * (np.sum(W1 ** 2) + np.sum(W2 ** 2))
+    loss += 0.5 * reg * (np.sum(W1**2) + np.sum(W2**2))
 
     #############################################################################
     #                              END OF YOUR CODE                             #
@@ -184,13 +187,24 @@ def validate_gradient():
     # these should all be less than 1e-8 or so
     for param_name in params:
         f = lambda W: compute_neural_net_loss(params, X, y, reg=0.1)[0]
-        param_grad_num = eval_numerical_gradient(f, params[param_name], verbose=False)
-        print('%s max relative error: %e' % (param_name, rel_error(param_grad_num, grads[param_name])))
+        param_grad_num = eval_numerical_gradient(f,
+                                                 params[param_name],
+                                                 verbose=False)
+        print('%s max relative error: %e' %
+              (param_name, rel_error(param_grad_num, grads[param_name])))
 
 
-def train(X, y, Xtest, ytest, learning_rate=1e-3, reg=1e-5, epochs=100, batch_size=20):
+def train(X,
+          y,
+          Xtest,
+          ytest,
+          learning_rate=1e-3,
+          reg=1e-5,
+          epochs=100,
+          batch_size=20):
     num_train, dim = X.shape
-    num_classes = np.max(y) + 1  # assume y takes values 0...K-1 where K is number of classes
+    num_classes = np.max(
+        y) + 1  # assume y takes values 0...K-1 where K is number of classes
     num_iters_per_epoch = int(math.floor(1.0 * num_train / batch_size))
 
     # In this exercise, we are going to work with a two-layer neural network
@@ -212,7 +226,8 @@ def train(X, y, Xtest, ytest, learning_rate=1e-3, reg=1e-5, epochs=100, batch_si
             batch_y = y[idx]
 
             # evaluate loss and gradient
-            loss, grads = compute_neural_net_loss(params, batch_x, batch_y, reg)
+            loss, grads = compute_neural_net_loss(params, batch_x, batch_y,
+                                                  reg)
 
             # update parameters
             sgd_update(params, grads, learning_rate)
@@ -237,17 +252,22 @@ reg = 0.001
 
 # get training and testing data
 train_x, train_y, test_x, test_y = get_data()
-params = train(train_x, train_y, test_x, test_y, learning_rate, reg, max_epochs, batch_size)
+params = train(train_x, train_y, test_x, test_y, learning_rate, reg,
+               max_epochs, batch_size)
 
 
 # Classify two new flower samples.
 def new_samples():
-    return np.array(
-        [[6.4, 3.2, 4.5, 1.5],
-         [5.8, 3.1, 5.0, 1.7]], dtype=np.float32)
+    return np.array([[6.4, 3.2, 4.5, 1.5], [5.8, 3.1, 5.0, 1.7]],
+                    dtype=np.float32)
 
 
 new_x = new_samples()
 predictions = predict(params, new_x)
 
 print("New Samples, Class Predictions:    {}\n".format(predictions))
+
+if __name__ == '__main__':
+    a = 1.0
+    res = (math.exp(a) - math.exp(-a)) / (math.exp(a) + math.exp(-a))
+    print(res)

@@ -1,6 +1,7 @@
 import mpmath
 import numpy as np
 from numpy import *
+
 filename = 'logistic_test'
 
 
@@ -31,9 +32,10 @@ def grad_ascent(data_mat, label_mat, weights, max_cycle, alpha):
     for k in range(max_cycle):
         h = sigmoid(data_matrix * weight)
         error = (class_label - h)
-        weight = weight + alpha * (1/m) * (error.transpose() * data_matrix).transpose()
+        weight = weight + alpha * (1 / m) * (error.transpose() *
+                                             data_matrix).transpose()
         # print(weight)
-    return weight,error
+    return weight, error
 
 
 def plot_base_fit(weights):  # 画出最终分类的图
@@ -73,7 +75,8 @@ def main():
     data_mat, label_mat = load_data_set()
     loops = 1000000
     print('Number of loops ' + str(loops))
-    weight,error = grad_ascent(data_mat, label_mat, [1, -1.5, -1.5], loops, 0.1)
+    weight, error = grad_ascent(data_mat, label_mat, [1, -1.5, -1.5], loops,
+                                0.1)
     # weight, error = grad_ascent(data_mat, label_mat, [1, 1, 1, 1], loops, 0.1)
     # plot_base_fit(weights)
     np.set_printoptions(threshold=np.inf)
