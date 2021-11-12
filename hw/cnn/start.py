@@ -197,7 +197,8 @@ def build_model(_device, _net):
         if _device_nums > 1:
             _net = torch.nn.DataParallel(_net)
     cudnn.benchmark = True
-    print('device type: ' + _device.type + ' ========= device number: ' + str(_device_nums))
+    print('device type: ' + _device.type + ' ========= device number: ' +
+          str(_device_nums))
     return _net, _device_nums
 
 

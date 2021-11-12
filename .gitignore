@@ -1,2 +1,13 @@
 /hw/data/cifar10/cifar-10-batches-py/
 /run/
+*.json
+*.csv
+*.npy
+/DAF-for-churn/data/
+/DAF-for-churn/src/D-Cox-Time/logs/
+/DAF-for-churn/src/logs/
+/DAF-for-churn/data/
+/DAF-for-churn/data/dataset_split/
+/.idea/
+*.pt
+/DAF-for-churn/src/D-Cox-Time/outputs/fold-1/

@@ -1,0 +1,11 @@
+*.log
+*.lock
+*.pt
+*.pth
+*.pyc
+logs
+predict
+run
+_pycache_
+*.md
+./data

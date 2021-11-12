@@ -41,8 +41,11 @@ def prepare_environment():
 
     # use get_status() to get a detailed status for the current AmlCompute.
     print(compute_target.get_status().serialize())
-    pytorch_env = Environment(name='pytorch', AZUREML_COMPUTE_USE_COMMON_RUNTIME='false')
-    pytorch_env = pytorch_env.get(workspace=ws, name='Azure-ml-py38-pyorch1.10-cuda11.3-ust', version='2')
+    pytorch_env = Environment(name='pytorch',
+                              AZUREML_COMPUTE_USE_COMMON_RUNTIME='false')
+    pytorch_env = pytorch_env.get(workspace=ws,
+                                  name='Azure-ml-py38-pyorch1.10-cuda11.3-ust',
+                                  version='2')
     return pytorch_env
 
 
@@ -55,8 +58,7 @@ def commit_job(_operate_env, _experiment):
                               dataset.as_named_input('input').as_mount()
                           ],
                           compute_target=cluster_name,
-                          environment=_operate_env
-                          )
+                          environment=_operate_env)
     run = _experiment.submit(config=src)
     tb = Tensorboard(runs=[run], port=6000, local_root='./hw/cnn/run')
     tb.start(start_browser=True)
