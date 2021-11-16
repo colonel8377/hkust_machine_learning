@@ -4,15 +4,15 @@ import logging
 import os
 import sys
 import time
+
 import numpy as np
 import pandas as pd
 import torch
 import torchtuples as tt
-
-from torch import nn
 from pycox.evaluation import EvalSurv
 from pycox.models import CoxTime
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from torch import nn
 
 sys.path.append(os.path.join(os.getcwd(), ".."))
 from utils import utils
@@ -58,16 +58,16 @@ class Hazard_net(nn.Module):
 class Dataset_loader():
     # Load data from dataset
     def __init__(
-        self,
-        data_path,
-        fold_define,
-        max_length=30,
-        continous_features=[],
-        categorial_features=[],
-        distance_features=[],
-        onehot=False,
-        distance_level=5,
-        onehot_dim=5,
+            self,
+            data_path,
+            fold_define,
+            max_length=30,
+            continous_features=[],
+            categorial_features=[],
+            distance_features=[],
+            onehot=False,
+            distance_level=5,
+            onehot_dim=5,
     ):
         '''
         Args:
@@ -129,6 +129,7 @@ class Dataset_loader():
                                             "feature_list.npy"),
                                allow_pickle=True)
         self.feature_idx = dict(zip(feature_list, range(len(feature_list))))
+        print(self.feature_idx)
         self.start_idx = np.where(
             self.X_features[:, self.feature_idx["day_depth"]] == 0)[0]
         self.start_idx = np.append(self.start_idx, self.X_features.shape[0])
@@ -210,11 +211,11 @@ class Dataset_loader():
                                      bins=train_bins,
                                      labels=False)
                 self.x_train_encode[:, encode_id:encode_id + len(train_bins) -
-                                    2] = pd.get_dummies(
-                                        train_labels).to_numpy()[:, :-1]
+                                                 2] = pd.get_dummies(
+                    train_labels).to_numpy()[:, :-1]
                 self.x_test_encode[:, encode_id:encode_id + len(train_bins) -
-                                   2] = pd.get_dummies(
-                                       test_labels).to_numpy()[:, :-1]
+                                                2] = pd.get_dummies(
+                    test_labels).to_numpy()[:, :-1]
                 encode_id += len(train_bins) - 2
 
         for i, feature in enumerate(self.categorial_features):
@@ -246,11 +247,11 @@ class Dataset_loader():
                                     test_labels[k] = l
                                     break
                 self.x_train_encode[:, encode_id:encode_id + len(train_bins) -
-                                    2] = pd.get_dummies(
-                                        train_labels).to_numpy()[:, :-1]
+                                                 2] = pd.get_dummies(
+                    train_labels).to_numpy()[:, :-1]
                 self.x_test_encode[:, encode_id:encode_id + len(train_bins) -
-                                   2] = pd.get_dummies(
-                                       test_labels).to_numpy()[:, :-1]
+                                                2] = pd.get_dummies(
+                    test_labels).to_numpy()[:, :-1]
                 encode_id += len(train_bins) - 2
 
         for feature in self.distance_features:
@@ -274,10 +275,9 @@ class Dataset_loader():
                 encode[value == 0, :] = 0
                 return encode
 
-            self.x_train_encode[:, encode_id:encode_id + len(train_bins) -
-                                1] = dummy(train_labels, self.x_train[:, idx])
-            self.x_test_encode[:, encode_id:encode_id + len(train_bins) -
-                               1] = dummy(test_labels, self.x_test[:, idx])
+            self.x_train_encode[:, encode_id:encode_id + len(train_bins) - 1] = dummy(train_labels,
+                                                                                      self.x_train[:, idx])
+            self.x_test_encode[:, encode_id:encode_id + len(train_bins) - 1] = dummy(test_labels, self.x_test[:, idx])
             self.difficulty_idx[feature] = encode_id
             self.difficulty_bins[feature] = train_bins
             encode_id += len(train_bins) - 1
@@ -324,9 +324,9 @@ class Dataset_loader():
 
 
 def analyse_beta(
-    this_beta,
-    Scale_list,
-    name="lose",
+        this_beta,
+        Scale_list,
+        name="lose",
 ):
     diff_level = len(Scale_list) - 1
     labels = [
@@ -405,7 +405,7 @@ def parse_global_args(parser):
                         help='Input data path.')
     parser.add_argument('--fold_define',
                         type=str,
-                        default='../../data/dataset_split',
+                        default='../../data/',
                         help='Uids for each fold.')
     parser.add_argument('--device',
                         type=str,
@@ -437,10 +437,11 @@ def parse_global_args(parser):
                         help='Whether load model and continue to train')
     parser.add_argument('--num_workers',
                         type=int,
-                        default=2,
+                        default=4,
                         help='Number of workers to load data.')
     parser.add_argument('--model_name', type=str, default="Cox_model_test")
     parser.add_argument("--fix_seed", type=int, default=0)
+    parser.add_argument("--predict", type=int, default=0)
     return parser
 
 
@@ -460,6 +461,9 @@ def training(args, fold, random_seed, data_loader):
     data_loader.construct_input_data(fold)
 
     x_train, u_train, y_train = data_loader.load_data("train")
+    print(x_train.shape)
+    print(u_train.shape)
+    print([y.shape for y in y_train])
     logging.info("Training data size: {}".format(x_train.shape))
     x_test, u_test, y_test = data_loader.load_data("test")
     logging.info("Test data size:{}".format(x_test.shape))
@@ -472,6 +476,7 @@ def training(args, fold, random_seed, data_loader):
         device = 'cuda'
     else:
         device = 'cpu'
+    Cox_model = None
     if args.optimizer == "Adam":
         Cox_model = CoxTime(
             Hazard_model,
@@ -490,84 +495,115 @@ def training(args, fold, random_seed, data_loader):
         Cox_model.load_net(
             os.path.join("./outputs/fold-%d/" % (fold), args.model_name,
                          args.model_name + ".pt"))
-
-    utils.check_dir(
-        os.path.join("./outputs/fold-%d/" % (fold), args.model_name,
-                     args.model_name + '.pt'))
-    logging.info("Training Cox hazard model...")
-    if args.earlystop_patience >= 0:
-        callbacks = [
-            tt.callbacks.EarlyStopping(
-                patience=args.earlystop_patience,
-                file_path='outputs/fold-%d/%s/earlystop.pt' %
-                (fold, args.model_name))
-        ]
+    if args.predict > 0:
+        logging.info("Loading exist model...")
+        base = './Checkpoints/fold-%d/' % (fold)
+        print(base + args.model_name + '/' +
+              args.model_name + '.pt')
+        model = Cox_model.load_net(
+            base + args.model_name + '/' +
+            args.model_name + '.pt')
+        model.predict_surv_df(x_test)
     else:
-        callbacks = []
+        utils.check_dir(
+            os.path.join("./outputs/fold-%d/" % (fold), args.model_name,
+                         args.model_name + '.pt'))
+        logging.info("Training Cox hazard model...")
+        if args.earlystop_patience >= 0:
+            callbacks = [
+                tt.callbacks.EarlyStopping(
+                    patience=args.earlystop_patience,
+                    file_path='outputs/fold-%d/%s/earlystop.pt' %
+                              (fold, args.model_name))
+            ]
+        else:
+            callbacks = []
 
-    Cox_model.optimizer.set_lr(args.lr)
-    log = Cox_model.fit(x_train,
-                        y_train,
-                        int(args.batch_size),
-                        args.epochs,
-                        callbacks,
-                        args.train_verbose,
-                        val_data=tt.tuplefy(x_test, y_test),
-                        num_workers=args.num_workers)
-    logging.info("Training Done!")
-    logging.info("Min val loss: {:<.4f}".format(
-        log.to_pandas().val_loss.min()))
-    beta = Cox_model.net.beta.cpu().detach().numpy()
+        lrfinder = Cox_model.lr_finder(x_train, y_train, int(args.batch_size), tolerance=2)
+        try:
+            lrfinder.to_pandas().to_csv('./outputs/lrfinder' + str(fold) + '.csv')
+            print('best lr: ' + str(lrfinder.get_best_lr()))
+            lrfinder.plot()
+        except Exception:
+            pass
+        Cox_model.optimizer.set_lr(args.lr)
+        log = Cox_model.fit(x_train,
+                            y_train,
+                            int(args.batch_size),
+                            args.epochs,
+                            callbacks,
+                            args.train_verbose,
+                            val_data=tt.tuplefy(x_test, y_test),
+                            num_workers=args.num_workers)
+        # log.plot()
+        # plt.savefig('../logs/log_' + str(fold) + '.png')
+        logging.info("Training Done!")
+        logging.info("Min val loss: {:<.4f}".format(
+            log.to_pandas().val_loss.min()))
+        beta = Cox_model.net.beta.cpu().detach().numpy()
 
-    # save models
-    logging.info("Saving best model...")
-    Cox_model.save_net(
-        os.path.join("outputs/fold-%d" % (fold), args.model_name,
-                     args.model_name + ".pt"))
+        # save models
+        logging.info("Saving best model...")
+        Cox_model.save_net(
+            os.path.join("outputs/fold-%d" % (fold), args.model_name,
+                         args.model_name + ".pt"))
 
-    # calculating figures
-    logging.info("Analysing difficulty hazrd parameters...")
-    d_idx = data_loader.difficulty_idx
-    diff_level = args.distance_level
-    diff_beta = beta[d_idx["PPD"]:d_idx["PPD"] + diff_level, :].T
-    analyse_beta(
-        diff_beta,
-        data_loader.difficulty_bins["PPD"],
-        "difficulty",
-    )
-    Scale_list = data_loader.difficulty_bins["PPD"][1:-1]
+        # calculating figures
+        logging.info("Analysing difficulty hazrd parameters...")
+        d_idx = data_loader.difficulty_idx
+        diff_level = args.distance_level
+        diff_beta = beta[d_idx["PPD"]:d_idx["PPD"] + diff_level, :].T
+        analyse_beta(
+            diff_beta,
+            data_loader.difficulty_bins["PPD"],
+            "difficulty",
+        )
+        Scale_list = data_loader.difficulty_bins["PPD"][1:-1]
 
-    # test
-    logging.info("Calculating performance of model on test set...")
-    logging.info("Calculating baseline hazards...")
-    baseline_hazards = Cox_model.compute_baseline_hazards()
-    logging.info("Predicting training set...")
-    surv = Cox_model.predict_surv(x_train, num_workers=args.num_workers)
-    surv_df = pd.DataFrame(surv.T)
-    ev = EvalSurv(surv_df, y_train[0], y_train[1], censor_surv='km')
-    c_index = ev.concordance_td("antolini")
-    logging.info("training set C INDEX: {:.3f}".format(c_index))
-    logging.info("Predicting test set...")
-    surv = Cox_model.predict_surv(x_test, num_workers=args.num_workers)
-    surv_df = pd.DataFrame(surv.T)
-    ev = EvalSurv(surv_df, y_test[0], y_test[1], censor_surv='km')
-    c_index = ev.concordance_td("antolini")
-    logging.info("test set C INDEX: {:.3f}".format(c_index))
-    time_grid = np.linspace(y_test[0].min(), y_test[0].max(),
-                            x_train.shape[2] + 1)
-    ibs = ev.brier_score(time_grid).mean()
-    logging.info("test set Brier score: {:.3f}".format(ibs))
+        # test
+        logging.info("Calculating performance of model on test set...")
+        logging.info("Calculating baseline hazards...")
+        baseline_hazards = Cox_model.compute_baseline_hazards()
+        logging.info("Predicting training set...")
+        surv = Cox_model.predict_surv(x_train, num_workers=args.num_workers)
+        # surv_df_1 = Cox_model.predict_surv_df(x_test, num_workers=args.num_workers)
+        # surv_df_1.to_csv('./outputs/surv_df_1_' + str(fold) + '.csv')
 
-    np.save(
-        os.path.join("outputs/fold-%d" % (fold), args.model_name, "beta"),
-        beta)
-    np.save(
-        os.path.join("outputs/fold-%d" % (fold), args.model_name,
-                     "diff_beta"), diff_beta)
-    np.save(
-        os.path.join("outputs/fold-%d" % (fold), args.model_name,
-                     "diff_scale"), Scale_list)
-    return c_index, ibs, log, diff_beta, Scale_list
+        surv_df = pd.DataFrame(surv.T)
+        # surv_df.to_csv('./outputs/surv_df_' + str(fold) + '.csv')
+
+        ev = EvalSurv(surv_df, y_train[0], y_train[1], censor_surv='km')
+        c_index = ev.concordance_td("antolini")
+
+        ev.brier_score(np.linspace(y_train[0].min(), y_train[1].max(), 100)).to_csv(
+            './outputs/brier_score_train' + str(fold) + '.csv')
+
+        logging.info("training set C INDEX: {:.3f}".format(c_index))
+        logging.info("Predicting test set...")
+        surv = Cox_model.predict_surv(x_test, num_workers=args.num_workers)
+        surv_df = pd.DataFrame(surv.T)
+        ev = EvalSurv(surv_df, y_test[0], y_test[1], censor_surv='km')
+
+        ev.brier_score(np.linspace(y_test[0].min(), y_test[1].max(), 100)).to_csv(
+            './outputs/brier_score_test' + str(fold) + '.csv')
+
+        c_index = ev.concordance_td("antolini")
+        logging.info("test set C INDEX: {:.3f}".format(c_index))
+        time_grid = np.linspace(y_test[0].min(), y_test[0].max(),
+                                x_train.shape[2] + 1)
+        ibs = ev.brier_score(time_grid).mean()
+        logging.info("test set Brier score: {:.3f}".format(ibs))
+
+        np.save(
+            os.path.join("outputs/fold-%d" % (fold), args.model_name, "beta"),
+            beta)
+        np.save(
+            os.path.join("outputs/fold-%d" % (fold), args.model_name,
+                         "diff_beta"), diff_beta)
+        np.save(
+            os.path.join("outputs/fold-%d" % (fold), args.model_name,
+                         "diff_scale"), Scale_list)
+        return c_index, ibs, log, diff_beta, Scale_list
 
 
 def main(args):

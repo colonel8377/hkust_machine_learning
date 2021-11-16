@@ -1,15 +1,6 @@
 import torch
+from pycox.models import CoxTime, CoxCC
 from torch import nn
-
-
-class LBSign(torch.autograd.Function):
-    @staticmethod
-    def forward(ctx, input):
-        return torch.sign(input)
-
-    @staticmethod
-    def backward(ctx, grad_output):
-        return grad_output.clamp_(-1, 1)
 
 
 class Hazard_net(nn.Module):
@@ -36,3 +27,12 @@ class Hazard_net(nn.Module):
 
     def predict(self, x_input, t):
         return self.forward(x_input, t)
+
+
+if __name__ == '__main__':
+    model = CoxTime(
+            Hazard_model,
+            tt.optim.Adam(weight_decay=args.weight_decay),
+            device=device,
+        )
+    model = model.load_net(path='./Checkpoints/fold-1/D-Cox-Time/D-Cox-Time.pt')

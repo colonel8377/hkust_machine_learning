@@ -9,3 +9,4 @@ run
 _pycache_
 *.md
 ./data
+*.npy

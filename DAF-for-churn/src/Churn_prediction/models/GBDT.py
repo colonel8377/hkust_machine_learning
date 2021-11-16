@@ -1,15 +1,14 @@
-import os
 import logging
-import argparse
-import numpy as np
-import pandas as pd
+import os
+import sys
 
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn import metrics
-
-from Models.base_model import base_model
-from helpers import utils
 import joblib
+from sklearn.ensemble import GradientBoostingClassifier
+
+from models.base_model import base_model
+
+sys.path.append(os.path.join(os.getcwd(), ".."))
+from helpers import utils
 
 
 class GBDT(base_model):

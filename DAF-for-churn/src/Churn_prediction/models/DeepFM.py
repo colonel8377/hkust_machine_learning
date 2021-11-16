@@ -1,17 +1,11 @@
 import os
-import pandas as pd
-import logging
-import argparse
-import numpy as np
-
-from deepctr_torch import models
-from deepctr_torch.inputs import SparseFeat, DenseFeat, get_feature_names
-from deepctr_torch import callbacks
-
-from Models.base_model import base_model
-from helpers import utils
-
+import sys
 import torch
+from deepctr_torch import callbacks
+from deepctr_torch import models
+from Models.base_model import base_model
+
+sys.path.append(os.path.join(os.getcwd(), ".."))
 
 
 class DeepFM(base_model):
@@ -58,8 +52,7 @@ class DeepFM(base_model):
         optimizer = torch.optim.Adam(self.classifier.parameters(), lr=args.lr)
         self.classifier.compile('adam',
                                 "binary_crossentropy",
-                                metrics=["binary_crossentropy", "auc"],
-                                val_metrics=["auc", "binary_crossentropy"])
+                                metrics=["binary_crossentropy", "auc"],)
         self.batch_size = args.batch_size
         self.max_epoch = args.max_epoch
         self.earlystop_patience = args.earlystop_patience

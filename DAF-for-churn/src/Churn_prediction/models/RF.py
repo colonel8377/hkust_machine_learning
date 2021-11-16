@@ -1,15 +1,18 @@
 import os
 import logging
 import argparse
+import sys
+
 import numpy as np
 import pandas as pd
-
+import joblib
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
 
 from Models.GBDT import GBDT
+
+sys.path.append(os.path.join(os.getcwd(), ".."))
 from helpers import utils
-import joblib
 
 
 class RF(GBDT):

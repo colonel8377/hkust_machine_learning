@@ -1,11 +1,13 @@
 import numpy as np
 import pandas as pd
 import os
+import sys
 import logging
+
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler, StandardScaler
 
-import sys
-import utils
+sys.path.append(os.path.join(os.getcwd(), ".."))
+from helpers import utils
 
 from deepctr_torch.inputs import SparseFeat, DenseFeat, get_feature_names
 

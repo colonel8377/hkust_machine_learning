@@ -58,30 +58,46 @@ def prepare_environment():
                               AZUREML_COMPUTE_USE_COMMON_RUNTIME='false')
     pytorch_env = pytorch_env.get(workspace=ws,
                                   name='churn-prediction',
-                                  version='3')
+                                  version='5')
     return pytorch_env
 
 
 def commit_job(_operate_env, _experiment):
     dataset = Dataset.File.from_files(path=(datastore, data_target_path))
     # foldset = Dataset.File.from_files(path=(datastore, fold_target_define))
+    # src = ScriptRunConfig(source_directory='./src',
+    #                       script='./Churn_prediction/main.py',
+    #                       arguments=[
+    #                           '--model_name', 'DeepFM',
+    #                           '--lr', '0.001',
+    #                           '--dnn_hidden_units', '256 256',
+    #                           '--l2_reg_linear', '1e-05',
+    #                           '--l2_reg_dnn', '1e-4',
+    #                           '--dnn_dropout', '0.5',
+    #                           '--dnn_use_bn', '0',
+    #                           '--data_path', dataset.as_named_input('input').as_mount(),
+    #                           '--feature_file', 'Churn-Features/feature_data.csv',
+    #                           '--user_path',  'dataset_split',
+    #                       ],
+    #                       compute_target=cluster_name,
+    #                       environment=_operate_env)
     src = ScriptRunConfig(source_directory='./src',
                           script='./D-Cox-Time/Cox_train.py',
                           arguments=[
-                              '--weight_decay', '0.8',
+                              '--model_name', 'D-Cox-Time'
                               '--lr', '0.01',
                               '--distance_level', '10',
                               '--max_session_length', '30',
-                              '--earlystop_patience', '10',
-                              '--optimizer', 'AdamWR',
+                              '--max_window_length', '30',
+                              '--earlystop_patience', '150',
+                              '--epochs', '10000',
+                              '--optimizer', 'Adam',
                               '--cross_validation', '5',
                               '--one_hot', '1',
                               '--data_path', dataset.as_named_input('input').as_mount(),
                               '--fold_define', dataset.as_named_input('input').as_mount(),
                               '--device', 'cuda',
-                              '--model_name', 'D-Cox-Time'
                           ],
-
                           compute_target=cluster_name,
                           environment=_operate_env)
     run = _experiment.submit(config=src)

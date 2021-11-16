@@ -7,7 +7,7 @@ import pandas as pd
 from sklearn import svm
 from sklearn import metrics
 
-from Models.base_model import base_model
+from models.base_model import base_model
 
 
 class SVM(base_model):

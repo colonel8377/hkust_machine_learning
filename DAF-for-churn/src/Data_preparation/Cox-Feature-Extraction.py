@@ -277,7 +277,7 @@ class DataTransformer(object):
         self.interactions = pd.DataFrame(interactions_np,
                                          columns=["user_id"] + feature_list)
 
-    def difficulty_process(self):
+    def difficulty_process(self, filepath):
         df = self.interactions
         # transfer absolute difficulty to personalized perceived difficulty
         X_features = []
@@ -292,6 +292,7 @@ class DataTransformer(object):
             columns=["retry_time", "global_retrytime", "user_id"])
         X_features = X_features + list(df_part.to_numpy())
         user_list = user_list + df["user_id"].tolist()
+        df.to_csv(os.path.join(filepath, "feature_list.csv"))
         self.feature_list = df_part.columns.to_numpy()
         self.X_features_np = np.array(X_features)
         self.user_list = np.array(user_list)
@@ -361,7 +362,7 @@ if __name__ == "__main__":
     logging.info("Generating features...")
     transformer.generate_features()
     logging.info("Processing transformation...")
-    transformer.difficulty_process()
+    transformer.difficulty_process(args.save_path)
     logging.info("Saving data...")
     transformer.save_npfile(args.save_path)
     transformer.save_dayfile(args.save_day_features_path)

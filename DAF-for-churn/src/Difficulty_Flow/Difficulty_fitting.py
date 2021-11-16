@@ -1,15 +1,18 @@
-import numpy as np
-import pandas as pd
-import logging
 import argparse
 import json
-import time
+import logging
 import os
 import sys
+import time
+
+import numpy as np
+import pandas as pd
 from matplotlib import pyplot as plt
-from ..utils import utils
+
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
 sys.path.append(os.path.join(os.getcwd(), ".."))
+from utils import utils
 
 
 class FitModel():
@@ -23,16 +26,16 @@ class FitModel():
 
     def plot_linear(self, x, y, a, b, uid=0, savefig=False, filename=""):
         # scatter original data, plot the linear ax+b
-        plt.figure(figsize=(10, 5))
-        ax = plt.subplot()
-        ax.scatter(x, y, s=2)
-        ax.plot(x, a * x + b, color='r')
-        ax.set_xlabel("level difficulty (global retry time)", fontsize=16)
-        ax.set_ylabel("user's retry time", fontsize=16)
-        ax.set_title("User %d" % (uid), fontsize=18)
+        # plt.figure(figsize=(10, 5))
+        # ax = plt.subplot()
+        # ax.scatter(x, y, s=2)
+        plt.plot(x, a * x + b, color='r')
+        # plt.set_xlabel("level difficulty (global retry time)", fontsize=16)
+        # plt.set_ylabel("user's retry time", fontsize=16)
+        # plt.set_title("PPD", fontsize=18)
         if savefig:
             plt.savefig("figures/" + filename)
-        plt.show()
+        # plt.show()
 
     def oneuser_fit(self, x, y):
         '''
@@ -95,7 +98,7 @@ class FitModel():
         retry_data.fillna(0, inplace=True)
         retry_dedup = retry_data.groupby(["user_id", "global_retrytime"]).agg({
             "retry_time":
-            "mean"
+                "mean"
         }).reset_index()  # if two levels have the same global_retrytime
 
         # fit the curve
@@ -103,17 +106,24 @@ class FitModel():
         param_dict = {}
         selist, selist_all, rlist_all = [], [], []
         is_first = True
+
+        plt.figure(figsize=(10, 5))
         for k, uid in enumerate(retry_uid):
             x = retry_dedup.loc[retry_dedup.user_id ==
                                 uid].global_retrytime.to_numpy()
-            y = retry_dedup.loc[retry_dedup.user_id ==
-                                uid].retry_time.to_numpy()
+            y = retry_dedup.loc[retry_dedup.user_id == uid].retry_time.to_numpy()
             x, y = zip(*sorted(zip(x, y), key=lambda a: a[0]))
             a, b, mse, r = self.oneuser_fit(np.array(x), np.array(y))
             param_dict[int(uid)] = [a, b]
             selist.append(mse / len(x))
             selist_all.append(mse)
             rlist_all.append(r)
+            if uid < 1000:
+                self.plot_linear(np.array(x), np.array(y), a, b, uid)
+        plt.xlabel("level difficulty (global retry time)", fontsize=16)
+        plt.ylabel("user's retry time", fontsize=16)
+        plt.title("PPD (1000 User)", fontsize=18)
+        plt.show()
         return param_dict, np.mean(selist), np.mean(rlist_all)
 
 
@@ -180,6 +190,7 @@ if __name__ == "__main__":
     logging.basicConfig(filename=args.log_file, level=args.verbose)
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
+    print(args.Neighbor_num)
     params, mse, r = Get_group_ab(args.data_file, args.Neighbor_num)
 
     if args.file_prefix == '':

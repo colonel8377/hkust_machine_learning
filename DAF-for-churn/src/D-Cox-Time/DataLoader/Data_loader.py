@@ -261,7 +261,10 @@ class Dataset_loader():
         uid_list = np.zeros((len(start_idx)))
         y_length = np.zeros((len(start_idx)))
         y_censor = np.zeros((len(start_idx)))
-
+        print(X_data.shape)
+        print(uid_list.shape)
+        print(y_censor.shape)
+        print(y_length.shape)
         for i in np.arange(len(start_idx)):
             j = idx_sort_origin[i]
             s_start, s_end = start_idx[j], end_idx[j]

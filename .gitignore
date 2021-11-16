@@ -11,3 +11,9 @@
 /.idea/
 *.pt
 /DAF-for-churn/src/D-Cox-Time/outputs/fold-1/
+/hw/data/cifar10/cifar-10-python.tar.gz
+/hw4.py
+/DAF-for-churn/src/Data_preparation/data/.log.txt
+*.jpg
+*.png
+
