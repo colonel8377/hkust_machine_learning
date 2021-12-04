@@ -85,12 +85,12 @@ Hadoop生态圈
 
 ## 部署
 
-暂无
+Azure 环境
 
-## 使用到的框架
+## 参考
 
-- [xxxxxxx](https://getbootstrap.com)
-- [xxxxxxx](https://jquery.com)
+- [top 1](https://https://github.com/guoday/Tencent2020_Rank1st)
+- [top 12](https://https://github.com/LogicJake/Tencent_Ads_Algo_2020_TOP12)
 - [xxxxxxx](https://laravel.com)
 
 
