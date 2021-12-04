@@ -16,11 +16,3 @@
 /DAF-for-churn/src/Data_preparation/data/.log.txt
 *.jpg
 *.png
-
-/top12/.idea/
-/top12/data/
-/top12/raw_data/
-/top12/prob/
-/top1/data/
-/top1/data_trim/
-/top12/.idea/
